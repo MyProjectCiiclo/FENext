@@ -1,6 +1,38 @@
+"use client";
+
 import { Mail, Phone, MapPin } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
+import { useContact } from "@/hooks/useContact";
+import { useState } from "react";
+import { ContactForm } from "@/types/contact";
 export default function Contact() {
+  const { sendContact, loading } = useContact();
+  const [formData, setFormData] = useState<ContactForm>({
+    name: "",
+    email: "",
+    message: "",
+  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    console.log("SUBMIT OK");
+    await sendContact(formData);
+
+    setFormData({
+      name: "",
+      email: "",
+      message: "",
+    });
+  };
   return (
     <section id="contact" className=" bg-[#FDF0F5] px-6 py-20 lg:px-[180px]">
       <div className="max-w-7xl mx-auto">
@@ -73,23 +105,32 @@ export default function Contact() {
               Send Message
             </h2>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <input
                 type="text"
                 placeholder="Your Name"
                 className="w-full p-4 rounded-2xl bg-[#fde7ef] border border-pink-100 text-[#6d4b59] placeholder-[#b88999] outline-none focus:ring-4 focus:ring-pink-200"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
               />
 
               <input
                 type="email"
                 placeholder="Your Email"
                 className="w-full p-4 rounded-2xl bg-[#fde7ef] border border-pink-100 text-[#6d4b59] placeholder-[#b88999] outline-none focus:ring-4 focus:ring-pink-200"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
               />
 
               <textarea
                 rows={5}
                 placeholder="Your Message"
                 className="w-full p-4 rounded-2xl bg-[#fde7ef] border border-pink-100 text-[#6d4b59] placeholder-[#b88999] outline-none resize-none focus:ring-4 focus:ring-pink-200"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
               />
 
               <button
