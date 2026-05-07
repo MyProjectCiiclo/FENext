@@ -1,8 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio Cá nhân
+
+Đây là một dự án Portfolio cá nhân được xây dựng bằng Next.js, nhằm giới thiệu các sản phẩm chất lượng và giải quyết vấn đề bằng công nghệ.
+
+## Giới thiệu
+
+Chào mừng bạn đến với Portfolio của tôi! Dự án này là nơi tôi trưng bày các dự án, kỹ năng và kinh nghiệm của mình trong lĩnh vực phát triển phần mềm. Mục tiêu là tạo ra những giải pháp công nghệ sáng tạo và hiệu quả.
+
+## Các tính năng chính
+
+- **Trang chủ:** Giới thiệu tổng quan về tôi và công việc của tôi.
+- **Dự án:** Trình bày chi tiết các dự án đã thực hiện, bao gồm mô tả, công nghệ sử dụng và liên kết đến mã nguồn/demo.
+- **Về tôi:** Thông tin cá nhân, kinh nghiệm làm việc, kỹ năng và sở thích.
+- **Liên hệ:** Các phương thức để kết nối với tôi.
+- **Blog (Sắp ra mắt):** Chia sẻ kiến thức, hướng dẫn và tài liệu liên quan đến công nghệ.
+
+## Công nghệ sử dụng
+
+- Next.js - Framework React cho các ứng dụng web hiệu suất cao.
+- React - Thư viện JavaScript để xây dựng giao diện người dùng.
+- Tailwind CSS - Framework CSS tiện ích để thiết kế nhanh chóng và linh hoạt (được suy ra từ các class trong `Footer.tsx`).
 
 ## Getting Started
 
-First, run the development server:
+Đầu tiên, chạy máy chủ phát triển:
 
 ```bash
 npm run dev
