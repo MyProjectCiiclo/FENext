@@ -3,10 +3,12 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { useContact } from "@/hooks/useContact";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ContactForm } from "@/types/contact";
+import { useAbout } from "@/hooks/useAbout";
 export default function Contact() {
   const { sendContact, loading } = useContact();
+  const { about, getAbout } = useAbout();
   const [formData, setFormData] = useState<ContactForm>({
     name: "",
     email: "",
@@ -33,11 +35,14 @@ export default function Contact() {
       message: "",
     });
   };
+  useEffect(() => {
+    getAbout();
+  }, []);
   return (
     <section id="contact" className=" bg-[#FDF0F5] px-6 py-20 lg:px-[180px]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <div className="relative inline-block bg-[#f8d9e5] text-[#6d4b59] px-8 py-3 rounded-xl text-lg font-semibold mb-6">
+          <div className="relative inline-block bg-[#f8d9e5] text-pink-400 px-8 py-3 rounded-xl text-lg font-semibold mb-6">
             Contact Me
             <span className="hidden md:block absolute top-1/2 right-full w-28 h-[1px] bg-pink-200 mr-4"></span>
             <span className="hidden md:block absolute top-1/2 left-full w-28 h-[1px] bg-pink-200 ml-4"></span>
@@ -67,7 +72,7 @@ export default function Contact() {
                 className="flex gap-2 items-center block hover:text-pink-400 duration-300"
               >
                 <Mail size={18} />
-                hokimthanh1234@gmail.com
+                {about?.email}
               </a>
 
               <a
@@ -95,7 +100,7 @@ export default function Contact() {
                 className="flex gap-2 items-center block hover:text-pink-400 duration-300"
               >
                 <FaGithub />
-                github.com/KimThanh1801
+                {about?.github}
               </a>
             </div>
           </div>
