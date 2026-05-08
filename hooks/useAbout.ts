@@ -13,7 +13,6 @@ export function useAbout() {
     try {
       const res = await SkillService.getSkills();
       setAbout(res.data.data);
-      console.log("about",res.data.data);
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong");
