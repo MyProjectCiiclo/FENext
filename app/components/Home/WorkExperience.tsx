@@ -9,7 +9,7 @@ export default function WorkExperience() {
 
   useEffect(() => {
     getWork?.();
-  }, [getWork]);
+  }, []);
 
   const list = Array.isArray(work) ? work : [];
 
@@ -23,20 +23,24 @@ export default function WorkExperience() {
           Work Experience
         </div>
 
-        <p className="text-pink-400 text-lg mb-4">
-          What I Have Done So Far
-        </p>
+        <p className="text-pink-400 text-lg mb-4">What I Have Done So Far</p>
 
         <h1 className="text-4xl lg:text-5xl font-bold text-[#6d4b59]">
           My Journey
         </h1>
       </div>
+
       <div className="relative">
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[3px] h-full bg-pink-200 hidden lg:block z-0" />
 
         <div className="space-y-16 relative z-10">
           {list.map((experience, index) => {
             const isLeft = index % 2 === 0;
+
+            const descList = (experience.description ?? "")
+              .split(".")
+              .map((s: string) => s.trim())
+              .filter(Boolean);
 
             const Card = (
               <motion.div
@@ -54,12 +58,9 @@ export default function WorkExperience() {
                 </p>
 
                 <ul className="space-y-3 text-[#7b5a68]">
-                  {(experience.description || "")
-                    .split(".")
-                    .filter((i) => i.trim() !== "")
-                    .map((item, i) => (
-                      <li key={i}>• {item}</li>
-                    ))}
+                  {descList.map((item: string, i: number) => (
+                    <li key={`${experience.id}-${i}`}>• {item}</li>
+                  ))}
                 </ul>
               </motion.div>
             );
@@ -74,8 +75,8 @@ export default function WorkExperience() {
                 <div className="relative flex flex-col items-center z-10">
                   <div className="w-20 h-20 rounded-full bg-white border-4 border-pink-200 flex items-center justify-center shadow-lg">
                     <img
-                      src={experience.logo}
-                      alt={experience.company}
+                      src={experience.logo || "/default-logo.png"}
+                      alt={`${experience.company} logo`}
                       className="w-10 h-10 object-contain"
                     />
                   </div>
