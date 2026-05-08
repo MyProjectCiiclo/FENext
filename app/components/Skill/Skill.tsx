@@ -1,26 +1,14 @@
+"use client";
+
+import { useSkill } from "@/hooks/useSkill";
+import { useEffect } from "react";
+
 export default function Skill() {
-  const skills = [
-    {
-      name: "React",
-      image: "https://cdn-icons-png.flaticon.com/512/1126/1126012.png",
-    },
-    {
-      name: "Vue",
-      image: "https://cdn-icons-png.flaticon.com/512/5968/5968672.png",
-    },
-    {
-      name: "TypeScript",
-      image: "https://cdn-icons-png.flaticon.com/512/5968/5968381.png",
-    },
-    {
-      name: "NodeJS",
-      image: "https://cdn-icons-png.flaticon.com/512/919/919825.png",
-    },
-    {
-      name: "PHP",
-      image: "https://cdn-icons-png.flaticon.com/512/919/919830.png",
-    },
-  ];
+  const { fetchSkills, skills = [] } = useSkill();
+
+  useEffect(() => {
+    fetchSkills();
+  }, []);
 
   return (
     <section
@@ -43,7 +31,7 @@ export default function Skill() {
               className="w-[200px] h-[180px] bg-white rounded-[12px] flex flex-col justify-center items-center shrink-0"
             >
               <img
-                src={skill.image}
+                src={skill.icon}
                 alt={skill.name}
                 className="w-[50px] h-[50px] object-contain mb-4"
               />
@@ -51,6 +39,7 @@ export default function Skill() {
               <h3 className="text-black text-[16px] font-medium">
                 {skill.name}
               </h3>
+
             </div>
           ))}
         </div>
