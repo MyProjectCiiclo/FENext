@@ -1,4 +1,5 @@
 
+import { WorkExperience } from "@/types/work";
 import api from "./api";
 
 export const workService = {
