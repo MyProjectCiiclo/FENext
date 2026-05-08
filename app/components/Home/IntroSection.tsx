@@ -63,7 +63,7 @@ export default function IntroSection() {
 
             <div className="relative w-[420px] h-[420px] rounded-full border-[18px] border-pink-300 overflow-hidden shadow-2xl z-10">
               <img
-                src="https://jbagy.me/wp-content/uploads/2025/03/Hinh-anh-doremon-cute-1.jpg"
+                src="/assets/image-personal.png"
                 alt="avatar"
                 className="w-full h-full object-cover"
               />

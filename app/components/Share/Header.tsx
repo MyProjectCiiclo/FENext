@@ -10,7 +10,7 @@ export default function Header() {
           <div className="relative">
 
             <img
-              src="https://jbagy.me/wp-content/uploads/2025/03/Hinh-anh-doremon-cute-1.jpg"
+              src="/assets/image-personal.png"
               alt="Avatar"
               className="w-[50px] h-[50px] rounded-full object-cover border-2 border-pink-300 shadow-[0_0_20px_rgba(244,114,182,0.35)] group-hover:scale-105 transition duration-300"
             />
