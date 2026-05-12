@@ -1,7 +1,13 @@
 import api from "../lib/api";
 
-export const SkillService = {
+export const skillService = {
   async getSkills() {
-    return api.get("/profile");
+    try {
+      const res = await api.get("/profile");
+      return res;
+    } catch (error) {
+      console.error("[skillService.getProfile] Error:", error);
+      throw error;
+    }
   },
 };

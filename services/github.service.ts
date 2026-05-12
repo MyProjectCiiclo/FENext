@@ -1,10 +1,21 @@
 import api from "../lib/api";
 
-export const gitthubService = {
+export const githubService = {
   async getContributions() {
-    return api.get("/github/contributions");
+    try {
+      const res = await api.get("/github/contributions");
+      return res;
+    } catch (error) {
+      throw error;
+    }
   },
+
   async getGithubUser() {
-    return api.get("/github/user");
+    try {
+      const res = await api.get("/github/user");
+      return res;
+    } catch (error) {
+      throw error;
+    }
   },
 };

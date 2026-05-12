@@ -1,13 +1,22 @@
-import { LoginForm } from "@/types/user.type";
+import { LoginForm, RegisterForm } from "@/types/user.type";
 import api from "../lib/api";
 
 export const userService = {
   async sendUserLogin(data: LoginForm) {
-    const res = await api.post("auth/login", data);
-    return res.data;
+    try {
+      const res = await api.post("/auth/login", data);
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
   },
-  async sendUserRegister() {
-    const res = await api.post("auth/register");
-    return res.data;
+
+  async sendUserRegister(data: RegisterForm) {
+    try {
+      const res = await api.post("/auth/register", data);
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
   },
 };
