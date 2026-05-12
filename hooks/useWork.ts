@@ -1,5 +1,5 @@
 import { workService } from "@/services/work.service";
-import { WorkExperience } from "@/types/work";
+import { WorkExperience } from "@/types/work.type";
 import { useState } from "react";
 import toast from "react-hot-toast";
 

@@ -1,20 +1,21 @@
-import About from "./components/sections/About";
-import Contact from "./components/sections/Contact";
-import GithubActivity from "./components/sections/GithubActivity";
-import IntroSection from "./components/sections/IntroSection";
-import Skill from "./components/sections/Skill";
-import WorkExperience from "./components/sections/WorkExperience";
+import {
+  About,
+  Contact,
+  GithubActivity,
+  IntroSection,
+  Skill,
+  WorkExperience,
+} from "./components/sections";
 
-
-export default function Home(){
-  return(
-    <>
+export default function Home() {
+  return (
+    <main>
       <IntroSection />
       <WorkExperience />
-      <Skill/>
-      <GithubActivity/>
+      <Skill />
+      <GithubActivity />
       <About />
       <Contact />
-    </>
-  )
+    </main>
+  );
 }

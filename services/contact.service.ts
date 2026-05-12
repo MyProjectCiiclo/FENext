@@ -1,5 +1,5 @@
-import api from "./api";
-import { ContactForm } from "@/types/contact";
+import api from "../lib/api";
+import { ContactForm } from "@/types/contact.type";
 
 export const contactService = {
   sendContact(payload: ContactForm) {

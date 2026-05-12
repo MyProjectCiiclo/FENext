@@ -1,5 +1,5 @@
 import { SkillService } from "@/services/skill.service";
-import { Profile } from "@/types/profile";
+import { Profile } from "@/types/profile.type";
 import { useState } from "react";
 import toast from "react-hot-toast";
 

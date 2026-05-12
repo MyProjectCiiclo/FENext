@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { useContact } from "@/hooks/useContact";
 import { useEffect, useState } from "react";
-import { ContactForm } from "@/types/contact";
+import { ContactForm } from "@/types/contact.type";
 import { useAbout } from "@/hooks/useAbout";
 export default function Contact() {
   const { sendContact, loading } = useContact();

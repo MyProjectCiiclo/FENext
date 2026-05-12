@@ -1,7 +1,7 @@
-import api from "./api"
+import api from "../lib/api";
 
 export const SkillService = {
-    async getSkills() {
-        return api.get("/profile")
-    }
-}
+  async getSkills() {
+    return api.get("/profile");
+  },
+};

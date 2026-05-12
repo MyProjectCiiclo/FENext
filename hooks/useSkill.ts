@@ -1,5 +1,5 @@
 import { SkillService } from "@/services/skill.service";
-import { Skill } from "@/types/skill";
+import { Skill } from "@/types/skill.type";
 import { useState } from "react";
 import toast from "react-hot-toast";
 

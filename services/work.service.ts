@@ -1,6 +1,5 @@
-
-import { WorkExperience } from "@/types/work";
-import api from "./api";
+import { WorkExperience } from "@/types/work.type";
+import api from "../lib/api";
 
 export const workService = {
   async getWork(): Promise<WorkExperience[]> {

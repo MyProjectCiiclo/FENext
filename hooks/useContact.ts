@@ -1,6 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { ContactForm } from "@/types/contact";
+import { ContactForm } from "@/types/contact.type";
 import { contactService } from "@/services/contact.service";
 
 export function useContact() {
