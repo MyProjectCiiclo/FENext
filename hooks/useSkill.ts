@@ -1,4 +1,4 @@
-import { SkillService } from "@/services/skill.service";
+import { skillService } from "@/services/skill.service";
 import { Skill } from "@/types/skill.type";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -10,7 +10,7 @@ export function useSkill() {
   const fetchSkills = async () => {
     setLoading(true);
     try {
-      const res = await SkillService.getSkills();
+      const res = await skillService.getSkills();
       setSkill(res.data.data.skills);
     } catch (err) {
       console.log(err);

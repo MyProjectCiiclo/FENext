@@ -1,7 +1,8 @@
-import { SkillService } from "@/services/skill.service";
+
 import { Profile } from "@/types/profile.type";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { skillService } from '@/services/skill.service';
 
 export function useAbout() {
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,7 @@ export function useAbout() {
     setLoading(true);
 
     try {
-      const res = await SkillService.getSkills();
+      const res = await skillService.getSkills();
       setAbout(res.data.data);
     } catch (error) {
       console.log(error);
