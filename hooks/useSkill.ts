@@ -12,7 +12,6 @@ export function useSkill() {
     try {
       const res = await SkillService.getSkills();
       setSkill(res.data.data.skills);
-      toast.success("Success!");
     } catch (err) {
       console.log(err);
       toast.error("Something went wrong");

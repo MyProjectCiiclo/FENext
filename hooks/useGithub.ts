@@ -1,4 +1,4 @@
-import { gitthubService } from "@/services/gtihub.service";
+import { gitthubService } from "@/services/github.service";
 import { GithubUser, GithubContribution } from "@/types/github";
 import { useState } from "react";
 import toast from "react-hot-toast";

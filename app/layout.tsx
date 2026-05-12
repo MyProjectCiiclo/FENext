@@ -1,6 +1,7 @@
-import Footer from "./components/Share/Footer";
-import Header from "./components/Share/Header";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import Header from "@/components/shared/Header";
+import Footer from "@/components/shared/Footer";
 export default function RootLayout({
   children,
 }: {
@@ -9,6 +10,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Toaster />
         <Header />
         {children}
         <Footer />

@@ -1,6 +1,16 @@
+"use client";
+import { useGithub } from "@/hooks/useGithub";
 import Link from "next/link";
+import { useEffect } from "react";
+import { FaRegFolderOpen } from "react-icons/fa";
+import { PiBugBeetleFill } from "react-icons/pi";
 
 export default function IntroSection() {
+  const { githubUser, getGithub } = useGithub();
+  useEffect(() => {
+    getGithub();
+  }, []);
+  console.log("data", githubUser);
   return (
     <section
       id="home"
@@ -71,17 +81,19 @@ export default function IntroSection() {
 
             <div className="absolute top-10 right-0 translate-x-10 bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg flex items-center gap-3 z-20">
               <div className="w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center text-white text-sm">
-                📄
+                <FaRegFolderOpen />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Project</p>
-                <p className="font-bold text-gray-800">1128+</p>
+                <p className="font-bold text-gray-800">
+                  {githubUser?.public_repos ?? 0}
+                </p>
               </div>
             </div>
 
             <div className="absolute bottom-10 left-0 -translate-x-10 bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg flex items-center gap-3 z-20">
               <div className="w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center text-white text-sm">
-                🐞
+                <PiBugBeetleFill />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Defects found</p>
