@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { AdminProfileSidebar } from ".";
+// import { AdminProfileSidebar } from ".";
 
 export default function ProfileProject() {
   const [profile, setProfile] = useState({
@@ -34,7 +34,7 @@ export default function ProfileProject() {
 
   return (
     <div className="h-screen flex overflow-hidden">
-      <AdminProfileSidebar/>
+      {/* <AdminProfileSidebar/> */}
       <div className="flex-1 h-screen overflow-y-auto ">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-5">
           <div className="bg-white rounded-3xl shadow-lg p-8">

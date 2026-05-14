@@ -16,6 +16,8 @@ export interface Profile {
   linkedin: string;
   avatar: string;
   cv_url: string;
+  location: string;
+  phone:string;
   created_at?: string;
   updated_at?: string;
   skills: Skill[];

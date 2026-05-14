@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import {
   FaChartPie,
@@ -8,52 +10,104 @@ import {
   FaChartLine,
   FaCog,
   FaSignOutAlt,
+  FaFileAlt,
+  FaLock,
 } from "react-icons/fa";
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
+  const [activeSection, setActiveSection] = useState("dashboard");
+
+  useEffect(() => {
+    if (pathname === "/dashboard") setActiveSection("dashboard");
+    else if (pathname.startsWith("/profile")) setActiveSection("profile");
+    else if (pathname === "/settings") setActiveSection("settings");
+  }, [pathname]);
+
+  const navItemClass = (active: boolean) =>
+    `flex items-center gap-3 p-3 rounded-lg transition ${
+      active ? "bg-white shadow-sm" : "hover:bg-white"
+    }`;
+
   return (
-    <aside className="w-64 h-screen bg-[#FDF0F5] text-white flex flex-col justify-between p-4 shrink-0">
+    <section className="w-64 h-screen bg-[#FDF0F5] flex flex-col justify-between p-4">
       <div>
         <div className="flex items-center gap-3 mb-8">
-          <div className="bg-[#FDF0F5] p-2 rounded-lg">
-            <FaChartPie className="text-pink-400" size={20} />
-          </div>
-
+          <FaChartPie className="text-pink-400" size={20} />
           <div>
             <h1 className="font-bold text-lg text-pink-400">MyDash</h1>
             <p className="text-[#6d4b59]">Profile Manager</p>
           </div>
         </div>
 
-        <nav className="space-y-4">
+        <nav className="space-y-2">
           <Link
             href="/dashboard"
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white"
+            onClick={() => setActiveSection("dashboard")}
+            className={navItemClass(activeSection === "dashboard")}
           >
-            <FaChartPie className="text-pink-400" size={20} />
+            <FaChartPie className="text-pink-400" />
             <span className="text-[#6d4b59]">Dashboard</span>
           </Link>
 
           <Link
             href="/profile"
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white"
+            onClick={() => setActiveSection("profile")}
+            className={navItemClass(activeSection === "profile")}
           >
-            <FaUser className="text-pink-400" size={20} />
+            <FaUser className="text-pink-400" />
             <span className="text-[#6d4b59]">Profile</span>
           </Link>
 
+          {pathname.startsWith("/profile") && (
+            <div className="ml-8 space-y-2">
+              <Link
+                href="/profile"
+                onClick={() => setActiveSection("profile")}
+                className={navItemClass(activeSection === "profile")}
+              >
+                <FaUser className="text-pink-400" size={14} />
+                <span className="text-[#6d4b59]">Personal Information</span>
+              </Link>
+
+              <Link
+                href="/profile#updateLogin"
+                onClick={() => setActiveSection("updateLogin")}
+                className={navItemClass(activeSection === "updateLogin")}
+              >
+                <FaLock className="text-pink-400" size={14} />
+                <span className="text-[#6d4b59]">Login & Password</span>
+              </Link>
+
+              <Link
+                href="/profile/cv"
+                onClick={() => setActiveSection("cv")}
+                className={navItemClass(activeSection === "cv")}
+              >
+                <FaFileAlt className="text-pink-400" size={14} />
+                <span className="text-[#6d4b59]">CV & Projects</span>
+              </Link>
+            </div>
+          )}
+
           <Link
             href="/dashboard#analytics-charts"
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white"
+            onClick={() => setActiveSection("analytics")}
+            className={navItemClass(activeSection === "analytics")}
           >
             <FaChartLine className="text-pink-400" size={20} />
             <span className="text-[#6d4b59]">Analytics</span>
           </Link>
 
-          <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-white">
-            <FaCog className="text-pink-400" size={20} />
+          <Link
+            href="/settings"
+            onClick={() => setActiveSection("settings")}
+            className={navItemClass(activeSection === "settings")}
+          >
+            <FaCog className="text-pink-400" />
             <span className="text-[#6d4b59]">Settings</span>
-          </div>
+          </Link>
         </nav>
       </div>
 
@@ -74,6 +128,6 @@ export default function Sidebar() {
           Logout
         </button>
       </div>
-    </aside>
+    </section>
   );
 }
