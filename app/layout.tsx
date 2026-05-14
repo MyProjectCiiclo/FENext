@@ -1,7 +1,5 @@
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import Header from "@/shared/Header";
-import Footer from "@/shared/Footer";
 
 export default function RootLayout({
   children,
@@ -11,10 +9,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Toaster />
-        <Header />
+        <Toaster position="top-right"/>
         {children}
-        <Footer />
       </body>
     </html>
   );

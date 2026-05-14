@@ -1,4 +1,4 @@
-import { gitthubService } from "@/services/github.service";
+import { githubService } from "@/services/github.service";
 import { GithubUser, GithubContribution } from "@/types/github.type";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -14,8 +14,8 @@ export function useGithub() {
     setLoading(true);
 
     try {
-      const userRes = await gitthubService.getGithubUser();
-      const contributionRes = await gitthubService.getContributions();
+      const userRes = await githubService.getGithubUser();
+      const contributionRes = await githubService.getContributions();
 
       setGithubUser(userRes.data);
       setContributions(contributionRes.data);

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
   return (
@@ -6,10 +7,12 @@ export default function Header() {
       <div className=" mx-auto flex items-center justify-between px-4 lg:px-[180px] py-2">
         <div className="flex items-center gap-4 cursor-pointer group">
           <div className="relative">
-            <img
+            <Image
               src="/assets/image-personal.png"
               alt="Avatar"
-              className="w-[50px] h-[50px] rounded-full object-cover border-2 border-pink-300 shadow-[0_0_20px_rgba(244,114,182,0.35)] group-hover:scale-105 transition duration-300"
+              width={50}
+              height={50}
+              className="rounded-full object-cover border-2 border-pink-300 shadow-[0_0_20px_rgba(244,114,182,0.35)] group-hover:scale-105 transition duration-300"
             />
 
             <div className="absolute inset-0 rounded-full border-2 border-pink-200 animate-ping opacity-20"></div>
