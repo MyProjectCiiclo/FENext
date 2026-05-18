@@ -1,5 +1,6 @@
 import { userService } from "@/services/user.service";
 import { LoginForm, RegisterForm, User } from "@/types/user.type";
+import { AxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -15,23 +16,13 @@ export function useUser() {
       toast.success("Login success!");
 
       return true;
-    } catch (error) {
-      toast.error("Login failed!");
-      return false;
-    }
-  };
+    } catch (error: AxiosError<any>) {
+      if (error.response?.status === 401) {
+        toast.error("Email hoặc mật khẩu không đúng!");
+      } else {
+        toast.error("Login failed!");
+      }
 
-  const infoRegister = async (data: RegisterForm) => {
-    try {
-      const userRegister = await userService.sendUserRegister(data);
-
-      setUser(userRegister.data);
-
-      toast.success("Register success!");
-
-      return true;
-    } catch (error) {
-      toast.error("Register failed!");
       return false;
     }
   };
@@ -39,6 +30,5 @@ export function useUser() {
   return {
     user,
     infoUser,
-    infoRegister,
   };
 }

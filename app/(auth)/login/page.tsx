@@ -25,7 +25,9 @@ export default function Login() {
 
       router.push("/dashboard");
     }
+    
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-pink-50">

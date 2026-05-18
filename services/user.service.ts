@@ -11,12 +11,4 @@ export const userService = {
     }
   },
 
-  async sendUserRegister(data: RegisterForm) {
-    try {
-      const res = await api.post("/auth/register", data);
-      return res.data;
-    } catch (error) {
-      throw error;
-    }
-  },
 };

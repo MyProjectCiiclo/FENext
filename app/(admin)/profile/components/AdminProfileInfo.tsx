@@ -4,13 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import { Mail, Phone, MapPin, Pencil, Camera } from "lucide-react";
 import type React from "react";
-import { useAvatarUpload } from "./useAvatarUpload";
+import { AdminAvatarUpload } from "./AdminAvatarUpload";
 
 export default function AdminProfileInfo() {
   const [edit, setEdit] = useState(false);
 
   const { avatar, fileRef, handleAvatarClick, handleAvatarChange } =
-    useAvatarUpload("/assets/image-personal.png");
+    AdminAvatarUpload("/assets/image-personal.png");
 
   const [profile, setProfile] = useState({
     full_name: "Ho Thi Kim Thanh",
@@ -78,11 +78,18 @@ export default function AdminProfileInfo() {
         <div className="-mt-16 flex justify-between items-end">
           <div className="relative">
             <div className="w-32 h-32 rounded-full overflow-hidden border-[5px] border-white shadow-xl">
-              <Image src={avatar} alt="avatar" width={140} height={140} className="w-full h-full object-cover"
+              <Image
+                src={avatar}
+                alt="avatar"
+                width={140}
+                height={140}
+                className="w-full h-full object-cover"
               />
             </div>
 
-            <button onClick={handleAvatarClick} className="   absolute bottom-1 right-1   w-10 h-10   rounded-full   bg-pink-500   text-white   flex items-center justify-center   border-4 border-white "
+            <button
+              onClick={handleAvatarClick}
+              className="   absolute bottom-1 right-1   w-10 h-10   rounded-full   bg-pink-500   text-white   flex items-center justify-center   border-4 border-white "
             >
               <Camera size={16} />
             </button>

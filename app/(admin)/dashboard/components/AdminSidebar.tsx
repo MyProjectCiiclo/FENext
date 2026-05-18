@@ -1,5 +1,6 @@
 "use client";
 
+import { GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,18 +12,21 @@ import {
   FaCog,
   FaSignOutAlt,
   FaFileAlt,
-  FaLock,
 } from "react-icons/fa";
 
 export default function Sidebar() {
   const pathname = usePathname();
 
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState<
+    "dashboard" | "profile" | "settings" | "analytics"
+  >("dashboard");
 
   useEffect(() => {
     if (pathname === "/dashboard") setActiveSection("dashboard");
     else if (pathname.startsWith("/profile")) setActiveSection("profile");
     else if (pathname === "/settings") setActiveSection("settings");
+    else if (pathname.startsWith("/dashboard#analytics"))
+      setActiveSection("analytics");
   }, [pathname]);
 
   const navItemClass = (active: boolean) =>
@@ -70,20 +74,19 @@ export default function Sidebar() {
                 <FaUser className="text-pink-400" size={14} />
                 <span className="text-[#6d4b59]">Personal Information</span>
               </Link>
-
               <Link
-                href="/profile#updateLogin"
-                onClick={() => setActiveSection("updateLogin")}
-                className={navItemClass(activeSection === "updateLogin")}
+                href="/profile?tab=profileEducation"
+                onClick={() => setActiveSection("profileEducation")}
+                className={navItemClass(activeSection === "profileEducation")}
               >
-                <FaLock className="text-pink-400" size={14} />
-                <span className="text-[#6d4b59]">Login & Password</span>
+                <GraduationCap className="text-pink-400" size={14} />
+                <span className="text-[#6d4b59]">Education</span>
               </Link>
 
               <Link
-                href="/profile/cv"
-                onClick={() => setActiveSection("cv")}
-                className={navItemClass(activeSection === "cv")}
+                href="/profile?tab=cvProjects"
+                onClick={() => setActiveSection("cvProjects")}
+                className={navItemClass(activeSection === "cvProjects")}
               >
                 <FaFileAlt className="text-pink-400" size={14} />
                 <span className="text-[#6d4b59]">CV & Projects</span>
