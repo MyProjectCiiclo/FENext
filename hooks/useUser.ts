@@ -1,44 +1,53 @@
 import { userService } from "@/services/user.service";
-import { LoginForm, RegisterForm, User } from "@/types/user.type";
+import { LoginForm, User } from "@/types/user.type";
+import { validateEmail } from "@/utils/validate";
+import { AxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const infoUser = async (data: LoginForm) => {
+  const infoUser = async (data: LoginForm): Promise<boolean> => {
+    setLoading(true);
+
     try {
-      const userLogin = await userService.sendUserLogin(data);
+      if (!data.email || !validateEmail(data.email)) {
+        toast.error("Invalid email format");
+        return false;
+      }
 
-      setUser(userLogin.data);
+      const response = await userService.sendUserLogin(data);
+
+      setUser(response.data);
 
       toast.success("Login success!");
 
       return true;
-    } catch (error) {
-      toast.error("Login failed!");
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message: string }>;
+      const status = err.response?.status;
+      const data = err.response?.data;
+
+      if (status === 401) {
+        toast.error("Incorrect email or password");
+      } else if (status === 422) {
+        const message = data?.message || "Validation error";
+
+        toast.error(message);
+      } else {
+        toast.error("Login failed!");
+      }
+
       return false;
+    } finally {
+      setLoading(false);
     }
   };
-
-  const infoRegister = async (data: RegisterForm) => {
-    try {
-      const userRegister = await userService.sendUserRegister(data);
-
-      setUser(userRegister.data);
-
-      toast.success("Register success!");
-
-      return true;
-    } catch (error) {
-      toast.error("Register failed!");
-      return false;
-    }
-  };
-
   return {
     user,
+    loading,
     infoUser,
-    infoRegister,
   };
 }
