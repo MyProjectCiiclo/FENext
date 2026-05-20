@@ -5,10 +5,9 @@ export const userService = {
   async sendUserLogin(data: LoginForm) {
     try {
       const res = await api.post("/auth/login", data);
-      return res.data;
+      return res;
     } catch (error) {
       throw error;
     }
   },
-
 };

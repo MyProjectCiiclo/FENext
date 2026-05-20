@@ -1,187 +1,306 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Folder, Trash, Pencil, X } from "lucide-react";
-import ProjectForm from "./ProjectForm";
+import { Folder, Pencil, Trash2 } from "lucide-react";
 
-export type Project = {
-  title: string;
-  desc: string;
-  image: File | string | null;
-  tech: string[];
-};
+import useProject from "@/hooks/useProject";
+import { Project } from "@/types";
+import LoadingSpinner from "@/shared/Loading";
+import ConfirmModalProject from "./ConfirmModalProject";
+
+const ProjectForm = dynamic(() => import("./ProjectForm"), {
+  loading: () => <LoadingSpinner />,
+});
 
 export default function AdminProjects() {
-  const [edit, setEdit] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const {
+    projects,
+    loading,
+    page,
+    meta,
+    getProjects,
+    createProject,
+    updateProject,
+    deleteProject,
+  } = useProject();
 
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      title: "E-commerce Website",
-      desc: "Full stack shopping website with cart & checkout",
-      image: "/assets/project1.png",
-      tech: ["Next.js", "Tailwind", "Node.js"],
-    },
-    {
-      title: "Admin Dashboard",
-      desc: "Dashboard quản lý user, analytics, CRUD system",
-      image: "/assets/project2.png",
-      tech: ["React", "Laravel", "MySQL"],
-    },
-  ]);
+  const [editMode, setEditMode] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] =
+    useState<Project | null>(null);
 
-  const openAdd = () => {
-    setEditingIndex(null);
-    setEditingProject(null);
-    setShowForm(true);
+  const [deleteId, setDeleteId] =
+    useState<number | null>(null);
+
+  useEffect(() => {
+    getProjects(page);
+  }, [getProjects, page]);
+
+  const handleAdd = () => {
+    setSelectedProject(null);
+    setOpen(true);
   };
 
-  const openEdit = (project: Project, index: number) => {
-    setEditingIndex(index);
-    setEditingProject(project);
-    setShowForm(true);
+  const handleEdit = (project: Project) => {
+    setSelectedProject({
+      ...project,
+      project_type: Array.isArray(project.project_type)
+        ? project.project_type
+        : project.project_type
+          ? (project.project_type as string).split(",")
+          : [],
+    });
+
+    setOpen(true);
   };
 
-  const handleSave = (data: Project) => {
-    if (editingIndex !== null) {
-      const updated = [...projects];
-      updated[editingIndex] = data;
-      setProjects(updated);
-    } else {
-      setProjects([...projects, data]);
+  const handleDelete = (id: number) => {
+    setDeleteId(id);
+  };
+
+  const confirmDeleteProject = async () => {
+    if (!deleteId) return;
+
+    try {
+      await deleteProject(deleteId);
+
+      await getProjects(page);
+    } catch (error) {
+      console.log("DELETE ERROR:", error);
+    } finally {
+      setDeleteId(null);
+    }
+  };
+
+  const handleSave = async (
+    data: Project,
+    file: File | null
+  ) => {
+    const formData = new FormData();
+
+    formData.append(
+      "project_name",
+      data.project_name
+    );
+
+    formData.append(
+      "description",
+      data.description
+    );
+
+    formData.append(
+      "language",
+      Array.isArray(data.language)
+        ? data.language.join(",")
+        : data.language
+    );
+
+    formData.append(
+      "project_type",
+      data.project_type.join(",")
+    );
+
+    if (file) {
+      formData.append("image_url", file);
     }
 
-    setShowForm(false);
-    setEditingIndex(null);
-    setEditingProject(null);
+    try {
+      if (selectedProject?.id) {
+        formData.append("_method", "PUT");
+
+        await updateProject(
+          Number(selectedProject.id),
+          formData
+        );
+      } else {
+        await createProject(formData);
+      }
+
+      await getProjects(page);
+
+      setOpen(false);
+    } catch (error) {
+      console.log("SAVE ERROR:", error);
+    }
   };
 
-  const deleteProject = (index: number) => {
-    const ok = window.confirm("Are you sure you want to delete this project?");
-    if (!ok) return;
+  const getImage = (
+    img: string | File | null
+  ) => {
+    if (!img) return "/default-project.png";
 
-    setProjects(projects.filter((_, i) => i !== index));
-  };
+    if (img instanceof File) {
+      return URL.createObjectURL(img);
+    }
 
-  const getImage = (img: File | string | null) => {
-    if (!img) return "";
-    if (img instanceof File) return URL.createObjectURL(img);
+    if (
+      typeof img === "string" &&
+      img.includes("example.com")
+    ) {
+      return "/default-project.png";
+    }
+
     return img;
   };
 
-  return (
-    <section className="bg-white rounded-[32px] overflow-hidden border border-pink-100 shadow-[0_10px_40px_rgba(255,105,180,0.08)]">
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
-      <div className="relative h-24 bg-gradient-to-r from-pink-500 via-pink-400 to-rose-300">
-        <button
-          onClick={() => setEdit(!edit)}
-          className="absolute top-5 right-5 px-5 py-2 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center gap-2 text-white hover:scale-105 transition"
-        >
-          <Pencil size={18} />
-          {edit ? "Close Edit" : "Edit Projects"}
-        </button>
+  return (
+    <section className="relative bg-white rounded-[32px] border border-pink-100 shadow-sm overflow-hidden">
+      <div className="h-24 bg-gradient-to-r from-pink-500 via-pink-400 to-rose-300" />
+
+      <div className="absolute left-8 top-14 w-20 h-20 rounded-3xl bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center">
+        <Folder
+          className="text-pink-500"
+          size={34}
+        />
       </div>
 
+      <button
+        onClick={() =>
+          setEditMode(!editMode)
+        }
+        className="absolute top-5 right-5 px-5 py-2 rounded-2xl bg-white/20 text-white border border-white/30 flex items-center gap-2 hover:scale-105 transition"
+      >
+        <Pencil size={18} />
 
-      <div className="px-8 pb-8 relative">
+        {editMode
+          ? "Close Edit"
+          : "Edit Projects"}
+      </button>
 
-        <div className="-mt-10 w-20 h-20 rounded-3xl bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center">
-          <Folder className="text-pink-500" size={34} />
-        </div>
-
+      <div className="px-8 pb-8 pt-16">
         <div className="flex items-center justify-between mt-6">
           <h2 className="text-3xl font-bold text-gray-800">
             Projects
           </h2>
 
-          {edit && (
-            <button
-              onClick={openAdd}
-              className="px-5 py-2 rounded-2xl bg-pink-500 text-white flex items-center gap-2 hover:scale-105 transition"
-            >
-              <Folder size={16} />
-              Add Project
-            </button>
-          )}
+          <button
+            onClick={handleAdd}
+            className="bg-pink-500 text-white px-5 py-2 rounded-xl hover:bg-pink-600 transition"
+          >
+            Add Project
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
-
-          {projects.map((project, index) => (
+          {projects?.map((project) => (
             <div
-              key={index}
-              className="bg-white rounded-2xl overflow-hidden border border-pink-100 shadow-sm relative"
+              key={project.id}
+              className="relative bg-white rounded-2xl overflow-hidden border border-pink-100 shadow-sm hover:shadow-lg transition"
             >
-
               <div className="h-44 relative">
                 <Image
-                  src={getImage(project.image)}
-                  alt={project.title}
+                  src={getImage(
+                    project.image_url
+                  )}
+                  alt={project.project_name}
                   fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-cover"
                 />
               </div>
 
               <div className="p-5 space-y-2">
                 <h3 className="font-bold text-lg text-gray-800">
-                  {project.title}
+                  {project.project_name}
                 </h3>
 
-                <p className="text-sm text-gray-500">
-                  {project.desc}
+                <p className="text-sm text-gray-500 line-clamp-3">
+                  {project.description}
                 </p>
 
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {project.tech.map((t) => (
-                    <span
-                      key={t}
-                      className="text-xs px-2 py-1 bg-pink-50 text-pink-600 rounded-full"
+                <p className="text-xs text-pink-500">
+                  {project.language}
+                </p>
+
+                {editMode && (
+                  <div className="absolute top-3 right-3 flex gap-2 z-10">
+                    <button
+                      onClick={() =>
+                        handleEdit(project)
+                      }
+                      className="bg-white/90 p-2 rounded-full shadow hover:scale-105 transition"
                     >
-                      {t}
-                    </span>
-                  ))}
-                </div>
+                      <Pencil
+                        size={18}
+                        className="text-pink-500"
+                      />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        handleDelete(project.id)
+                      }
+                      className="bg-white/90 p-2 rounded-full shadow hover:scale-105 transition"
+                    >
+                      <Trash2
+                        size={18}
+                        className="text-red-500"
+                      />
+                    </button>
+                  </div>
+                )}
               </div>
-
-              {edit && (
-                <div className="absolute top-3 right-3 flex gap-2">
-                  <button
-                    onClick={() => openEdit(project, index)}
-                    className="p-2 bg-white rounded-lg shadow text-blue-500"
-                  >
-                    <Pencil size={14} />
-                  </button>
-
-                  <button
-                    onClick={() => deleteProject(index)}
-                    className="p-2 bg-white rounded-lg shadow text-red-500"
-                  >
-                    <Trash size={14} />
-                  </button>
-                </div>
-              )}
             </div>
           ))}
         </div>
 
-        {edit && (
-          <button className="mt-8 w-full rounded-2xl bg-gradient-to-r from-pink-500 to-rose-400 py-4 text-white font-semibold hover:scale-[1.01] transition">
-            Save Changes
+        <div className="flex items-center justify-center gap-4 mt-10">
+          <button
+            disabled={page === 1}
+            onClick={() =>
+              getProjects(page - 1)
+            }
+            className="px-4 py-2 rounded-xl bg-pink-500 text-white disabled:opacity-50"
+          >
+            Previous
           </button>
-        )}
-      </div>
 
-      {showForm && (
-        <ProjectForm
-          initialData={editingProject}
-          onSave={handleSave}
-          onClose={() => setShowForm(false)}
+          <span className="font-semibold text-gray-700">
+            Page {meta?.current_page} /{" "}
+            {meta?.last_page}
+          </span>
+
+          <button
+            disabled={
+              page === meta?.last_page
+            }
+            onClick={() =>
+              getProjects(page + 1)
+            }
+            className="px-4 py-2 rounded-xl bg-pink-500 text-white disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
+        {open && (
+          <ProjectForm
+            initialData={selectedProject}
+            onSave={handleSave}
+            onClose={() => {
+              setOpen(false);
+              setSelectedProject(null);
+            }}
+          />
+        )}
+
+        <ConfirmModalProject
+          open={deleteId !== null}
+          title="Delete Project"
+          message="Are you sure you want to delete this project?"
+          onConfirm={confirmDeleteProject}
+          onClose={() =>
+            setDeleteId(null)
+          }
         />
-      )}
+      </div>
     </section>
   );
 }

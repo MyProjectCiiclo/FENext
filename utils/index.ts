@@ -1,0 +1,1 @@
+import { validateEmail } from "@/utils/validate";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { ContactForm } from "@/types/contact.type";
-import { contactService } from "@/services/contact.service";
+import { ContactForm } from "@/types";
+import { contactService } from "@/services";
 
 export function useContact() {
   const [loading, setLoading] = useState(false);
@@ -10,7 +10,8 @@ export function useContact() {
     setLoading(true);
 
     try {
-      await contactService.sendContact(payload);
+      const res = await contactService.sendContact(payload);
+      return res;
       toast.success("Send success!");
     } catch (err) {
       console.log(err);

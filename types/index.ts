@@ -1,0 +1,7 @@
+export * from "./contact.type";
+export * from "./project.type";
+export * from "./skill.type";
+export * from "./user.type";
+export * from "./work.type";
+export * from "./github.type";
+export * from "./profile.type";

@@ -3,13 +3,39 @@
 import { useSearchParams } from "next/navigation";
 
 import AdminLayout from "../AdminLayout";
+import dynamic from "next/dynamic";
+import LoadingSpinner from "@/shared/Loading";
 
-import {
-  AdminProfileInfo,
-  AdminLoginPassword,
-  AdminCvProjects,
-  AdminEducation,
-} from "./components";
+
+const AdminProfileInfo = dynamic(()=>
+  import ("./components").then((module)=>module.AdminProfileInfo),
+  {
+    loading: () => <LoadingSpinner />,
+  }
+);
+
+const AdminLoginPassword = dynamic(()=>
+  import ("./components").then((module)=>module.AdminLoginPassword),
+  {
+    loading: () => <LoadingSpinner />,
+  }
+);
+
+const AdminEducation = dynamic(()=>
+  import ("./components").then((module)=>module.AdminEducation),
+  {
+    loading: () => <LoadingSpinner />,
+  }
+);
+
+const AdminCvProjects = dynamic(()=>
+  import ("./components").then((module)=>module.AdminCvProjects),
+  {
+    loading: () => <LoadingSpinner />,
+  }
+);
+
+
 
 export default function ProfilePage() {
   const searchParams = useSearchParams();

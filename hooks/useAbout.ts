@@ -1,8 +1,8 @@
 
-import { Profile } from "@/types/profile.type";
+import { skillService } from "@/services";
+import { Profile } from "@/types";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { skillService } from '@/services/skill.service';
 
 export function useAbout() {
   const [loading, setLoading] = useState(false);
