@@ -1,17 +1,19 @@
-import { skillService } from "@/services/skill.service";
-import { Skill } from "@/types/skill.type";
+import { skillService } from "@/services";
+import { Skill } from "@/types";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 export function useSkill() {
   const [loading, setLoading] = useState(false);
-  const [skills, setSkill] = useState<Skill[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
 
   const fetchSkills = async () => {
     setLoading(true);
+
     try {
       const res = await skillService.getSkills();
-      setSkill(res.data.data.skills);
+
+      setSkills(res.data.data.skills);
     } catch (err) {
       console.log(err);
       toast.error("Something went wrong");

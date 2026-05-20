@@ -1,7 +1,6 @@
-import { workService } from "@/services/work.service";
-import { WorkExperience } from "@/types/work.type";
+import { workService } from "@/services";
+import { WorkExperience } from "@/types";
 import { useState } from "react";
-import toast from "react-hot-toast";
 
 export function useWork() {
   const [loading, setLoading] = useState(false);

@@ -1,5 +1,5 @@
-import { userService } from "@/services/user.service";
-import { LoginForm, User } from "@/types/user.type";
+import { userService } from "@/services";
+import { LoginForm, User } from "@/types";
 import { validateEmail } from "@/utils/validate";
 import { AxiosError } from "axios";
 import { useState } from "react";
@@ -10,34 +10,47 @@ export function useUser() {
   const [loading, setLoading] = useState(false);
 
   const infoUser = async (data: LoginForm): Promise<boolean> => {
+    if (!data.email || !validateEmail(data.email)) {
+      toast.error("Invalid email format");
+      return false;
+    }
+
     setLoading(true);
 
     try {
-      if (!data.email || !validateEmail(data.email)) {
-        toast.error("Invalid email format");
+      const response = await userService.sendUserLogin(data);
+
+      console.log("LOGIN RESPONSE:", response.data);
+
+      const userData = response.data?.user;
+      const token = response.data?.access_token;
+      
+      if (!token) {
+        console.log("❌ NO TOKEN FROM BACKEND");
+        toast.error("Server did not return token");
         return false;
       }
 
-      const response = await userService.sendUserLogin(data);
-
-      setUser(response.data);
+      setUser(userData);
+      localStorage.setItem("token", token);
 
       toast.success("Login success!");
-
       return true;
     } catch (error: unknown) {
-      const err = error as AxiosError<{ message: string }>;
+      const err = error as AxiosError<any>;
+
+      console.log("LOGIN ERROR:", err.response?.data);
+      console.log("STATUS:", err.response?.status);
+
       const status = err.response?.status;
-      const data = err.response?.data;
+      const message = err.response?.data?.message;
 
       if (status === 401) {
         toast.error("Incorrect email or password");
       } else if (status === 422) {
-        const message = data?.message || "Validation error";
-
-        toast.error(message);
+        toast.error(message || "Validation error");
       } else {
-        toast.error("Login failed!");
+        toast.error(message || "Login failed!");
       }
 
       return false;
@@ -45,6 +58,7 @@ export function useUser() {
       setLoading(false);
     }
   };
+
   return {
     user,
     loading,

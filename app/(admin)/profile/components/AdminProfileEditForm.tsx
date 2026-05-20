@@ -74,6 +74,7 @@ export default function AdminProfileEditForm({
         onChange={handleChange}
         className="w-full border p-2 rounded-xl mb-3"
         placeholder="Title"
+        required
       />
 
       <textarea
@@ -82,6 +83,7 @@ export default function AdminProfileEditForm({
         onChange={handleChange}
         className="w-full border p-2 rounded-xl mb-3"
         placeholder="Description"
+        required
       />
 
       <input
@@ -89,7 +91,8 @@ export default function AdminProfileEditForm({
         value={profile.phone}
         onChange={handleChange}
         className="w-full border p-2 rounded-xl mb-3"
-        placeholder="Phone"
+        placeholder="Phone" 
+        required
       />
 
       <input
@@ -98,6 +101,7 @@ export default function AdminProfileEditForm({
         onChange={handleChange}
         className="w-full border p-2 rounded-xl mb-3"
         placeholder="Location"
+        required
       />
 
       <div className="flex gap-3 mt-4">

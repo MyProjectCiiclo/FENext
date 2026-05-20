@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-export function useAvatarUpload(initialAvatar: string) {
+export function AdminAvatarUpload (initialAvatar: string) {
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const [avatar, setAvatar] = useState(initialAvatar);

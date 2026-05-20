@@ -1,69 +1,69 @@
 "use client";
 
-import { useMemo } from "react";
+import {
+  LineChart,
+  Line,
+  ResponsiveContainer,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-export default function ActivityChart() {
-  const contributions = [
-    { date: "Mon", value: 2 },
-    { date: "Tue", value: 6 },
-    { date: "Wed", value: 4 },
-    { date: "Thu", value: 9 },
-    { date: "Fri", value: 7 },
-    { date: "Sat", value: 12 },
-    { date: "Sun", value: 8 },
-  ];
+const data = [
+  { month: "Jan", contributions: 120 },
+  { month: "Feb", contributions: 80 },
+  { month: "Mar", contributions: 150 },
+  { month: "Apr", contributions: 100 },
+  { month: "May", contributions: 170 },
+  { month: "Jun", contributions: 140 },
+];
 
-  const chartPoints = useMemo(() => {
-    if (!contributions.length) return [];
-
-    const max = Math.max(...contributions.map((d) => d.value), 1);
-    const stepX = 900 / (contributions.length - 1 || 1);
-
-    return contributions.map((d, i) => ({
-      x: i * stepX,
-      y: 200 - (d.value / max) * 180,
-    }));
-  }, [contributions]);
-
-  const linePoints = useMemo(() => {
-    if (!chartPoints.length) return "";
-    return chartPoints.map((p) => `${p.x},${p.y}`).join(" ");
-  }, [chartPoints]);
-
+export default function OverviewChart() {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 mt-10">
-      <h3 className="text-sm font-semibold text-gray-900">
-        Activity Overview
-      </h3>
+    <div className="p-4 border border-pink-100 rounded-xl mt-5">
+      
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900">
+          Activity Overview
+        </h3>
 
-      <p className="text-xs text-gray-500 mt-1 mb-5">
-        GitHub contributions activity
-      </p>
+        <p className="text-xs text-gray-500 mt-1">
+          GitHub contributions activity
+        </p>
+      </div>
 
-      <div className="relative h-[220px] border-b border-l border-gray-300 ml-6 mr-4">
-        <div className="absolute left-0 right-0 border-t border-dashed border-gray-200 top-[20%]" />
-        <div className="absolute left-0 right-0 border-t border-dashed border-gray-200 top-[40%]" />
-        <div className="absolute left-0 right-0 border-t border-dashed border-gray-200 top-[60%]" />
-        <div className="absolute left-0 right-0 border-t border-dashed border-gray-200 top-[80%]" />
-
-        <svg className="absolute inset-0 w-full h-full overflow-visible">
-          <polyline
-            fill="none"
-            stroke="#2563eb"
-            strokeWidth={2}
-            points={linePoints}
-          />
-
-          {chartPoints.map((p, i) => (
-            <circle
-              key={i}
-              cx={p.x}
-              cy={p.y}
-              r={3}
-              fill="#2563eb"
+      <div className="h-[300px] w-full mt-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data}>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="#E5E7EB"
             />
-          ))}
-        </svg>
+
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 12, fill: "#6B7280" }}
+            />
+
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 12, fill: "#6B7280" }}
+            />
+
+            <Line
+              type="monotone"
+              dataKey="contributions"
+              stroke="#2563EB"
+              strokeWidth={3}
+              dot={{ r: 4, fill: "#2563EB" }}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

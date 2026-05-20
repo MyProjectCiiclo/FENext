@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Eye, EyeOff } from "lucide-react";
+import { Pencil, Eye, EyeOff, User } from "lucide-react";
 
 export default function ProfilePage() {
-  const [openUpdate, setOpenUpdate] = useState(false);
-
+  const [edit, setEdit] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
 
@@ -14,228 +13,187 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="w-full">
-        <div
+    <section
+      className="
+        bg-white
+        rounded-[32px]
+        overflow-hidden
+        border border-pink-100
+        shadow-[0_10px_40px_rgba(255,105,180,0.08)]
+        relative
+      "
+    >
+      <div className="relative h-20 bg-gradient-to-r from-pink-500 via-pink-400 to-rose-300">
+        <button
+          onClick={() => setEdit(!edit)}
           className="
-            bg-white
-            rounded-[30px]
-            border
-            border-pink-100
-            shadow-sm
-            p-10
-            relative
-            overflow-hidden
+            absolute top-5 right-5
+            px-5 py-2
+            rounded-2xl
+            bg-white/20
+            backdrop-blur-md
+            border border-white/30
+            flex items-center gap-2
+            text-white
+            hover:scale-105
+            transition
           "
         >
-          <div className="absolute top-0 right-0 w-72 h-72 bg-pink-100 rounded-full blur-3xl opacity-30" />
+          <Pencil size={18} />
+          {edit ? "Close Edit" : "Edit Profile"}
+        </button>
+      </div>
 
-          <div className="relative z-10">
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-pink-400">
-                  Login & Password
-                </h2>
+      <div className="px-8 pb-10 relative">
+        <div className="-mt-10 w-20 h-20 rounded-3xl bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center">
+          <User className="text-pink-500" size={36} />
+        </div>
 
-                <p className="text-[#6d4b59] italic mt-4 text-lg">
-                  Update your login information and secure your account.
-                </p>
-              </div>
+        <h2 className="text-3xl font-bold text-gray-800 mt-6">
+          Login & Password
+        </h2>
 
-              <button
-                onClick={() => setOpenUpdate(!openUpdate)}
-                className="
-                  border border-pink-400
-                  text-pink-500
-                  px-6 py-3
-                  rounded-2xl
-                  flex items-center gap-3
-                  hover:bg-pink-500
-                  hover:text-white
-                  transition
-                "
-              >
-                <Pencil size={18} />
+        <p className="text-[#6d4b59] mt-2">
+          Update your login information and secure your account.
+        </p>
 
-                {openUpdate ? "Close" : "Update"}
-              </button>
-            </div>
+        <div className="mt-8 space-y-5">
+          <div className="flex items-center">
+            <p className="text-pink-500 text-sm font-medium w-40">
+              EMAIL
+            </p>
+            <p className="text-gray-700 font-semibold">
+              {profile.email}
+            </p>
+          </div>
 
-            <div className="mt-10 space-y-6">
-              <div className="flex items-center">
-                <p className="text-pink-400 text-sm font-medium w-40">
-                  EMAIL ADDRESS
-                </p>
-
-                <h3 className="text-lg font-semibold text-[#6d4b59]">
-                  {profile.email}
-                </h3>
-              </div>
-
-              <div className="flex items-center">
-                <p className="text-pink-400 text-sm font-medium w-40">
-                  PASSWORD
-                </p>
-
-                <h3 className="text-lg font-semibold text-[#6d4b59]">
-                  ••••••••••
-                </h3>
-
-                <div className="ml-auto text-right text-gray-400 text-sm">
-                  Last updated 2 days ago
-                </div>
-              </div>
-
-              {openUpdate && (
-                <div
-                  className="
-                    mt-4
-                    rounded-3xl
-                    border
-                    border-pink-100
-                    bg-pink-50/40
-                    p-4
-                    animate-in
-                    fade-in
-                    slide-in-from-top-3
-                    duration-300
-                  "
-                >
-                  <div className="grid grid-cols-1 mb-2">
-                    <div>
-                      <label className="block text-pink-500 font-semibold mb-3">
-                        Email
-                      </label>
-
-                      <div className="relative">
-                        <input
-                          type={showNew ? "text" : "password"}
-                          placeholder="Enter new email"
-                          className="
-                            w-full
-                            rounded-2xl
-                            border
-                            border-pink-100
-                            bg-white
-                            px-5
-                            py-4
-                            pr-14
-                            outline-none
-                            focus:border-pink-400
-                          "
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-pink-500 font-semibold mb-3">
-                        Current Password
-                      </label>
-
-                      <div className="relative">
-                        <input
-                          type={showCurrent ? "text" : "password"}
-                          placeholder="Enter current password"
-                          className="
-                            w-full
-                            rounded-2xl
-                            border
-                            border-pink-100
-                            bg-white
-                            px-5
-                            py-4
-                            pr-14
-                            outline-none
-                            focus:border-pink-400
-                          "
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => setShowCurrent(!showCurrent)}
-                          className="
-                            absolute
-                            right-5
-                            top-1/2
-                            -translate-y-1/2
-                            text-gray-500
-                          "
-                        >
-                          {showCurrent ? (
-                            <EyeOff size={20} />
-                          ) : (
-                            <Eye size={20} />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-pink-500 font-semibold mb-3">
-                        New Password
-                      </label>
-
-                      <div className="relative">
-                        <input
-                          type={showNew ? "text" : "password"}
-                          placeholder="Enter new password"
-                          className="
-                            w-full
-                            rounded-2xl
-                            border
-                            border-pink-100
-                            bg-white
-                            px-5
-                            py-4
-                            pr-14
-                            outline-none
-                            focus:border-pink-400
-                          "
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => setShowNew(!showNew)}
-                          className="
-                            absolute
-                            right-5
-                            top-1/2
-                            -translate-y-1/2
-                            text-gray-500
-                          "
-                        >
-                          {showNew ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end mt-4">
-                    <button
-                      className="
-                        px-8
-                        py-4
-                        rounded-2xl
-                        bg-gradient-to-r
-                        from-pink-500
-                        to-rose-400
-                        text-white
-                        font-semibold
-                        hover:scale-[1.01]
-                        transition
-                      "
-                    >
-                      Save Changes
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+          <div className="flex items-center">
+            <p className="text-pink-500 text-sm font-medium w-40">
+              PASSWORD
+            </p>
+            <p className="text-gray-700 font-semibold">
+              ••••••••••
+            </p>
           </div>
         </div>
+
+        {edit && (
+          <div
+            className="
+              mt-8
+              p-6
+              rounded-3xl
+              border border-pink-100
+              bg-pink-50/30
+              space-y-6
+            "
+          >
+            <div>
+              <label className="block text-pink-500 font-semibold mb-2">
+                Email
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter new email"
+                className="
+                  w-full
+                  rounded-2xl
+                  border-2 border-pink-200
+                  bg-white
+                  px-4 py-3
+                  outline-none
+                  focus:border-pink-500
+                "
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-pink-500 font-semibold mb-2">
+                  Current Password
+                </label>
+
+                <div className="relative">
+                  <input
+                    type={showCurrent ? "text" : "password"}
+                    placeholder="Current password"
+                    className="
+                      w-full
+                      rounded-2xl
+                      border-2 border-pink-200
+                      bg-white
+                      px-4 py-3
+                      pr-12
+                      outline-none
+                      focus:border-pink-500
+                    "
+                  />
+
+                  <button
+                    onClick={() => setShowCurrent(!showCurrent)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  >
+                    {showCurrent ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-pink-500 font-semibold mb-2">
+                  New Password
+                </label>
+
+                <div className="relative">
+                  <input
+                    type={showNew ? "text" : "password"}
+                    placeholder="New password"
+                    className="
+                      w-full
+                      rounded-2xl
+                      border-2 border-pink-200
+                      bg-white
+                      px-4 py-3
+                      pr-12
+                      outline-none
+                      focus:border-pink-500
+                    "
+                  />
+
+                  <button
+                    onClick={() => setShowNew(!showNew)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  >
+                    {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <button
+              className="
+                w-full
+                mt-2
+                rounded-2xl
+                bg-gradient-to-r
+                from-pink-500
+                to-rose-400
+                py-4
+                text-white
+                font-semibold
+                hover:scale-[1.01]
+                transition
+              "
+            >
+              Save Changes
+            </button>
+          </div>
+        )}
       </div>
-    </div>
+    </section>
   );
 }
