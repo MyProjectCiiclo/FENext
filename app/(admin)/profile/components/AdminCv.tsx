@@ -1,99 +1,165 @@
 "use client";
 
-import { useState } from "react";
-import { Upload, Download, Pencil, FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Upload, Download, Pencil, FileText, Trash2 } from "lucide-react";
+import useCv from "@/hooks/useCV";
 
 export default function AdminCv() {
   const [edit, setEdit] = useState(false);
-  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setCvFile(e.target.files[0]);
+  const { cv, infoCv, createCv, deleteCv } = useCv();
+
+  useEffect(() => {
+    infoCv();
+  }, [infoCv]);
+
+  const isValidUrl = (url: string) => {
+    if (!url) return false;
+    if (url.startsWith("file://")) return false;
+    return true;
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoadingUpload(true);
+
+    try {
+      await createCv(file);
+      await infoCv();
+      setEdit(false);
+    } catch (error) {
+      console.log("UPLOAD ERROR:", error);
+    } finally {
+      setLoadingUpload(false);
+      e.target.value = "";
     }
   };
 
-  const handleDownload = () => {
-    if (!cvFile) return;
+  const handleDownload = async (url: string) => {
+    if (!isValidUrl(url)) return;
 
-    const url = URL.createObjectURL(cvFile);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = cvFile.name;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = "cv.pdf";
+
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.log("DOWNLOAD ERROR:", error);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    const confirmDelete = window.confirm("Delete this CV?");
+    if (!confirmDelete) return;
+
+    setLoadingDelete(id);
+
+    try {
+      await deleteCv(id);
+      await infoCv();
+    } catch (error) {
+      console.log("DELETE ERROR:", error);
+    } finally {
+      setLoadingDelete(null);
+    }
   };
 
   return (
-    <section className="bg-white rounded-[32px] overflow-hidden border border-pink-100 shadow-[0_10px_40px_rgba(255,105,180,0.08)]">
-
+    <section className="bg-white rounded-[32px] overflow-hidden border border-pink-100">
       <div className="relative h-20 bg-gradient-to-r from-pink-500 via-pink-400 to-rose-300">
         <button
           onClick={() => setEdit(!edit)}
-          className="absolute top-5 right-5 px-5 py-2 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center gap-2 text-white hover:scale-105 transition"
+          className="absolute top-5 right-5 flex items-center gap-2 px-5 py-2 rounded-2xl bg-white/20 text-white"
         >
           <Pencil size={18} />
           {edit ? "Close Edit" : "Edit CV"}
         </button>
       </div>
 
-      <div className="px-8 pb-8 relative">
+      <div className="p-6">
+        <FileText className="text-pink-500" size={34} />
 
-        <div className="-mt-10 w-20 h-20 rounded-3xl bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center">
-          <FileText className="text-pink-500" size={34} />
+        <h2 className="text-2xl font-bold mt-4">CV Management</h2>
+
+        <div className="mt-6 space-y-4">
+          {Array.isArray(cv) && cv.length > 0 ? (
+            cv.map((item: any) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-4 border rounded-2xl"
+              >
+                {isValidUrl(item.cv) ? (
+                  <a
+                    href={item.cv}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-pink-500 underline"
+                  >
+                    View CV {item.id}
+                  </a>
+                ) : (
+                  <span className="text-gray-400">Invalid CV link</span>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleDownload(item.cv)}
+                    className="flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-gray-100"
+                  >
+                    <Download size={16} />
+                    Download
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    disabled={loadingDelete === item.id}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 disabled:opacity-50"
+                  >
+                    <Trash2 size={16} />
+                    {loadingDelete === item.id ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400">No CV uploaded</p>
+          )}
         </div>
 
-        <h2 className="text-3xl font-bold text-gray-800 mt-6">
-          CV Management
-        </h2>
+        {edit && (
+          <label className="mt-6 inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-xl cursor-pointer hover:bg-pink-600">
+            <Upload size={16} />
+            {loadingUpload ? "Uploading..." : "Upload New CV"}
 
-        <div className="mt-6 p-6 rounded-2xl border border-pink-100 bg-[#fff7fb]">
+            <input
+              type="file"
+              hidden
+              accept="application/pdf"
+              onChange={handleUpload}
+            />
+          </label>
+        )}
 
-          <div className="space-y-2">
-            {cvFile ? (
-              <p className="text-gray-700">
-                Current file:{" "}
-                <span className="font-semibold text-pink-500">
-                  {cvFile.name}
-                </span>
-              </p>
-            ) : (
-              <p className="text-gray-400">
-                No CV uploaded yet
-              </p>
-            )}
-          </div>
-
-          <div className="flex gap-3 mt-5">
-
-            {edit && (
-              <label className="px-5 py-2 rounded-2xl bg-pink-500 text-white flex items-center gap-2 cursor-pointer hover:scale-105 transition">
-                <Upload size={16} />
-                Upload CV
-
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  hidden
-                  onChange={handleUpload}
-                />
-              </label>
-            )}
-
-            <button
-              onClick={handleDownload}
-              disabled={!cvFile}
-              className="px-5 py-2 rounded-2xl border border-pink-200 text-pink-500 flex items-center gap-2 disabled:opacity-40"
-            >
-              <Download size={16} />
-              Download
-            </button>
-          </div>
-        </div>
-
-        <p className="text-sm text-gray-400 mt-4">
-          Upload your latest CV in PDF format for recruiters to download.
-        </p>
+        <a
+          href="https://res.cloudinary.com/droybexbj/raw/upload/v1779337532/buzkrwgbrxwi8dju3i2e.pdf"
+          target="_blank"
+        >
+          Open CV
+        </a>
       </div>
     </section>
   );
