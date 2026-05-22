@@ -5,3 +5,5 @@ export * from "./user.type";
 export * from "./work.type";
 export * from "./github.type";
 export * from "./profile.type";
+export * from "./education.type";
+export * from "./course.type";
