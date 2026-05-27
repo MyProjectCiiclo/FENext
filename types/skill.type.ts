@@ -4,6 +4,7 @@ export interface Skill {
   name: string;
   percent: number;
   icon: string;
+  color?: string;
   created_at?: string;
   updated_at?: string;
 }

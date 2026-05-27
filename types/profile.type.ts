@@ -17,8 +17,8 @@ export interface Profile {
   avatar: string;
   cv_url: string;
   location: string;
-  phone:string;
+  phone: string;
   created_at?: string;
   updated_at?: string;
-  skills: Skill[];
+  skills?: Skill[];
 }

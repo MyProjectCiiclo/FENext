@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -11,42 +11,62 @@ import {
   Legend,
 } from "recharts";
 
+import { useSkill } from "@/hooks/useSkill";
+import { useWork } from "@/hooks/useWork";
+import { Skill } from "@/types";
+
 export default function AnalyticsCharts() {
+  const { skills, fetchSkills } = useSkill();
+  const { work, getWork } = useWork();
+
   const [hovered, setHovered] = useState<null | {
     name: string;
     percent: number;
   }>(null);
 
-  const skills = [
-    { name: "React", percent: 30, color: "#f472b6" },
-    { name: "Next.js", percent: 25, color: "#ec4899" },
-    { name: "JavaScript", percent: 25, color: "#fb7185" },
-    { name: "TypeScript", percent: 20, color: "#f9a8d4" },
-  ];
+  useEffect(() => {
+    fetchSkills();
+    getWork();
+  }, []);
 
-  const data = [
-    { years: "years 1", performance: 55, totalProjects: 65 },
-    { years: "years 2", performance: 60, totalProjects: 62 },
-    { years: "years 3", performance: 65, totalProjects: 63 },
-    { years: "years 4", performance: 70, totalProjects: 60 },
-  ];
+  const safeSkills: Skill[] = Array.isArray(skills) ? skills : [];
+
+  const totalWeight = safeSkills.reduce(
+    (sum, s) => sum + (s.weight || 1),
+    0
+  );
+
+  const normalizedSkills = safeSkills.map((s) => ({
+    ...s,
+    percent: totalWeight ? ((s.weight || 1) / totalWeight) * 100 : 0,
+  }));
 
   let current = 0;
 
-  const gradient = skills
-    .map((skill) => {
-      const start = current;
-      const end = current + skill.percent;
+  const gradient = normalizedSkills.length
+    ? normalizedSkills
+        .map((skill) => {
+          const start = current;
+          const end = current + skill.percent;
 
-      current = end;
+          current = end;
 
-      return `${skill.color} ${start}% ${end}%`;
-    })
-    .join(",");
+          return `${skill.color} ${start}% ${end}%`;
+        })
+        .join(",")
+    : "";
+
+  const workData = Array.isArray(work)
+    ? work.map((item) => ({
+        year: item.year,
+        totalProjects: item.total,
+      }))
+    : [];
 
   return (
     <section id="analytics-charts">
       <div className="flex gap-6 mt-6">
+
         <div className="border border-pink-100 rounded-xl p-4 flex-1 flex flex-col">
           <div>
             <h3 className="text-pink-400 font-bold text-xl">
@@ -59,22 +79,25 @@ export default function AnalyticsCharts() {
           </div>
 
           <div className="relative flex flex-col items-center mt-6 flex-1">
+
             <div
               className="w-[210px] h-[210px] rounded-full"
               style={{
-                background: `conic-gradient(${gradient})`,
+                background: gradient
+                  ? `conic-gradient(${gradient})`
+                  : "#e5e7eb",
               }}
             />
 
             <div className="absolute inset-0 flex">
-              {skills.map((skill) => (
+              {normalizedSkills.map((skill) => (
                 <div
                   key={skill.name}
-                  style={{ flex: skill.percent }}
+                  style={{ flex: 1 }}
                   onMouseEnter={() =>
                     setHovered({
                       name: skill.name,
-                      percent: skill.percent,
+                      percent: Math.round(skill.percent),
                     })
                   }
                   onMouseLeave={() => setHovered(null)}
@@ -89,64 +112,53 @@ export default function AnalyticsCharts() {
             )}
 
             <div className="text-sm mt-5 flex flex-wrap gap-x-6 gap-y-2 justify-center">
-              {skills.map((skill) => (
-                <div
-                  key={skill.name}
-                  className="flex items-center gap-2"
-                >
+              {normalizedSkills.map((skill) => (
+                <div key={skill.name} className="flex items-center gap-2">
                   <span
                     className="w-3 h-3 rounded-full"
-                    style={{
-                      background: skill.color,
-                    }}
+                    style={{ background: skill.color }}
                   />
-
                   <span className="whitespace-nowrap">
-                    {skill.name}: {skill.percent}%
+                    {skill.name}: {Math.round(skill.percent)}%
                   </span>
                 </div>
               ))}
             </div>
+
           </div>
         </div>
 
         <div className="border border-pink-100 rounded-xl p-4 flex-1 flex flex-col">
           <div>
             <h3 className="text-pink-400 font-bold text-xl">
-              Project Overview (By Year)
+              WORK EXPERIENCE
             </h3>
 
             <p className="text-gray-400 italic text-sm">
-              Number of projects completed each year
+              Total projects by year
             </p>
           </div>
 
           <div className="w-full h-[300px] mt-6 flex-1">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
-                <XAxis dataKey="years" />
-
+            <ResponsiveContainer>
+              <BarChart data={workData}>
+                <XAxis dataKey="year" />
                 <YAxis />
-
                 <Tooltip />
-
                 <Legend />
 
                 <Bar
-                  dataKey="performance"
-                  fill="#2563eb"
-                  radius={[6, 6, 0, 0]}
-                />
-
-                <Bar
                   dataKey="totalProjects"
-                  fill="#dc2626"
+                  fill="#ec4899"
+                  name="Total Projects"
                   radius={[6, 6, 0, 0]}
+                  barSize={20}
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
+
       </div>
     </section>
   );

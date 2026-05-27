@@ -1,11 +1,14 @@
-"use client";
+'use client'
 
 import { useRef, useState } from "react";
 
-export function AdminAvatarUpload (initialAvatar: string) {
+export function AdminAvatarUpload(initialAvatar: string) {
   const fileRef = useRef<HTMLInputElement | null>(null);
-
   const [avatar, setAvatar] = useState(initialAvatar);
+
+  function setDbAvatar(url: string) {
+    setAvatar(url);
+  }
 
   function handleAvatarClick() {
     fileRef.current?.click();
@@ -24,5 +27,6 @@ export function AdminAvatarUpload (initialAvatar: string) {
     fileRef,
     handleAvatarClick,
     handleAvatarChange,
+    setDbAvatar,
   };
 }

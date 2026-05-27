@@ -3,6 +3,7 @@
 import { GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 import {
   FaChartPie,
@@ -11,7 +12,12 @@ import {
   FaCog,
   FaSignOutAlt,
   FaFileAlt,
+  FaEnvelope,
+  FaStar,
+  FaTasks,
 } from "react-icons/fa";
+
+import { useUser } from "@/hooks/useUser";
 
 type ActiveSection =
   | "dashboard"
@@ -19,45 +25,52 @@ type ActiveSection =
   | "settings"
   | "profileEducation"
   | "cvProjects"
-  | "analytics";
+  | "analytics"
+  | "management"
+  | "contactManagement"
+  | "ratingManagement";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const { user, getUser } = useUser();
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
   const tab = searchParams.get("tab");
 
-  const hash =
-    typeof window !== "undefined"
-      ? window.location.hash
-      : "";
+  const hash = typeof window !== "undefined" ? window.location.hash : "";
 
-  const isAnalytics =
-    pathname === "/dashboard" &&
-    hash === "#analytics-charts";
+  const isAnalytics = pathname === "/dashboard" && hash === "#analytics-charts";
 
-  const activeSection: ActiveSection =
-    isAnalytics
-      ? "analytics"
-      : pathname === "/dashboard"
+  const activeSection: ActiveSection = isAnalytics
+    ? "analytics"
+    : pathname === "/dashboard"
       ? "dashboard"
       : pathname === "/settings"
-      ? "settings"
-      : pathname.startsWith("/profile") &&
-        tab === "profileEducation"
-      ? "profileEducation"
-      : pathname.startsWith("/profile") &&
-        tab === "cvProjects"
-      ? "cvProjects"
-      : pathname.startsWith("/profile")
-      ? "profile"
-      : "dashboard";
+        ? "settings"
+        : pathname.startsWith("/profile") && tab === "profileEducation"
+          ? "profileEducation"
+          : pathname.startsWith("/profile") && tab === "cvProjects"
+            ? "cvProjects"
+            : pathname.startsWith("/profile")
+              ? "profile"
+              : pathname.startsWith("/management") &&
+                  tab === "managementContact"
+                ? "contactManagement"
+                : pathname.startsWith("/management") &&
+                    tab === "managementRating"
+                  ? "ratingManagement"
+                  : pathname.startsWith("/management")
+                    ? "management"
+                    : "dashboard";
 
   const navItemClass = (active: boolean) =>
     `flex items-center gap-3 p-3 rounded-lg transition ${
-      active
-        ? "bg-white shadow-sm"
-        : "hover:bg-white"
+      active ? "bg-white shadow-sm" : "hover:bg-white"
     }`;
 
   return (
@@ -67,113 +80,109 @@ export default function Sidebar() {
           <FaChartPie className="text-pink-400" size={20} />
 
           <div>
-            <h1 className="font-bold text-lg text-pink-400">
-              MyDash
-            </h1>
+            <h1 className="font-bold text-lg text-pink-400">MyDash</h1>
 
-            <p className="text-[#6d4b59]">
-              Profile Manager
-            </p>
+            <p className="text-[#6d4b59]">Profile Manager</p>
           </div>
         </div>
 
         <nav className="space-y-2">
           <Link
             href="/dashboard"
-            className={navItemClass(
-              activeSection === "dashboard"
-            )}
+            className={navItemClass(activeSection === "dashboard")}
           >
             <FaChartPie className="text-pink-400" />
-            <span className="text-[#6d4b59]">
-              Dashboard
-            </span>
+
+            <span className="text-[#6d4b59]">Dashboard</span>
           </Link>
 
           <Link
             href="/profile"
-            className={navItemClass(
-              activeSection === "profile"
-            )}
+            className={navItemClass(activeSection === "profile")}
           >
             <FaUser className="text-pink-400" />
-            <span className="text-[#6d4b59]">
-              Profile
-            </span>
+
+            <span className="text-[#6d4b59]">Profile</span>
           </Link>
 
           {pathname.startsWith("/profile") && (
             <div className="ml-8 space-y-2">
               <Link
                 href="/profile"
-                className={navItemClass(
-                  activeSection === "profile"
-                )}
+                className={navItemClass(activeSection === "profile")}
               >
                 <FaUser size={14} className="text-pink-400" />
-                <span className="text-[#6d4b59]">
-                  Personal Information
-                </span>
+
+                <span className="text-[#6d4b59]">Personal</span>
               </Link>
 
               <Link
                 href="/profile?tab=profileEducation"
-                className={navItemClass(
-                  activeSection ===
-                    "profileEducation"
-                )}
+                className={navItemClass(activeSection === "profileEducation")}
               >
-                <GraduationCap
-                  size={14}
-                  className="text-pink-400"
-                />
-                <span className="text-[#6d4b59]">
-                  Education
-                </span>
+                <GraduationCap size={14} className="text-pink-400" />
+
+                <span className="text-[#6d4b59]">Education</span>
               </Link>
 
               <Link
                 href="/profile?tab=cvProjects"
-                className={navItemClass(
-                  activeSection === "cvProjects"
-                )}
+                className={navItemClass(activeSection === "cvProjects")}
               >
-                <FaFileAlt
-                  size={14}
-                  className="text-pink-400"
-                />
-                <span className="text-[#6d4b59]">
-                  CV & Projects
-                </span>
+                <FaFileAlt size={14} className="text-pink-400" />
+
+                <span className="text-[#6d4b59]">CV & Projects</span>
+              </Link>
+            </div>
+          )}
+
+          <Link
+            href="/management"
+            className={navItemClass(activeSection === "management")}
+          >
+            <FaTasks className="text-pink-400" />
+
+            <span className="text-[#6d4b59]">Management</span>
+          </Link>
+
+          {pathname.startsWith("/management") && (
+            <div className="ml-8 space-y-2">
+              <Link
+                href="/management?tab=managementContact"
+                className={navItemClass(activeSection === "contactManagement")}
+              >
+                <FaEnvelope size={14} className="text-pink-400" />
+
+                <span className="text-[#6d4b59]">Contact</span>
+              </Link>
+
+              <Link
+                href="/management?tab=managementRating"
+                className={navItemClass(activeSection === "ratingManagement")}
+              >
+                <FaStar size={14} className="text-pink-400" />
+
+                <span className="text-[#6d4b59]">Rating</span>
               </Link>
             </div>
           )}
 
           <Link
             href="/dashboard#analytics-charts"
-            className={navItemClass(
-              activeSection === "analytics"
-            )}
+            className={navItemClass(activeSection === "analytics")}
           >
-            <FaChartLine
-              className="text-pink-400"
-              size={20}
-            />
-            <span className="text-[#6d4b59]">
-              Analytics
-            </span>
+            <FaChartLine className="text-pink-400" size={20} />
+
+            <span className="text-[#6d4b59]">Analytics</span>
           </Link>
 
           <Link
             href="/settings"
-            className={navItemClass(
-              activeSection === "settings"
-            )}
+            className={navItemClass(activeSection === "settings")}
           >
             <FaCog className="text-pink-400" />
-            <span className="text-[#6d4b59]">
-              Settings
-            </span>
+
+            <span className="text-[#6d4b59]">Settings</span>
           </Link>
         </nav>
       </div>
@@ -181,18 +190,16 @@ export default function Sidebar() {
       <div>
         <div className="flex items-center gap-3 border border-[#6d4b59] p-3 rounded-lg mb-4">
           <div className="w-10 h-10 flex items-center justify-center rounded-full">
-            <FaUser
-              className="text-pink-400"
-              size={20}
-            />
+            <FaUser className="text-pink-400" size={20} />
           </div>
 
           <div>
             <p className="text-sm font-semibold text-pink-400">
-              John Doe
+              {user?.name || "Loading..."}
             </p>
-            <p className="text-[#6d4b59]">
-              user@example.com
+
+            <p className="text-[#6d4b59] text-sm break-all">
+              {user?.email || "Loading..."}
             </p>
           </div>
         </div>

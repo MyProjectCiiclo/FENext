@@ -1,8 +1,12 @@
+"use client";
+
 import { useState, useCallback } from "react";
 import { cvService } from "@/services";
+import { Cv } from "@/types";
+import toast from "react-hot-toast";
 
 export default function useCv() {
-  const [cv, setCv] = useState<any[]>([]);
+  const [cv, setCv] = useState<Cv[]>([]);
   const [loading, setLoading] = useState(false);
 
   const infoCv = useCallback(async () => {
@@ -13,33 +17,46 @@ export default function useCv() {
       const list = res.data.data;
 
       setCv(list || []);
+      return list;
     } catch (error) {
       console.log("GET CV ERROR:", error);
+      toast.error("Failed to load CV");
+      return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
   const createCv = async (file: File) => {
+    if (!file) return;
+
     setLoading(true);
 
     try {
       const formData = new FormData();
       formData.append("cv", file);
 
-      const res = await cvService.sendCv(formData);
+      await cvService.sendCv(formData);
 
-      console.log("UPLOAD SUCCESS:", res.data);
+      toast.success("Upload CV success 🎉");
 
       await infoCv();
     } catch (error: any) {
-      console.log("UPLOAD ERROR:", error?.response?.data);
+      console.log("UPLOAD ERROR:", error);
+
+      const msg =
+        error?.response?.data?.errors?.cv?.[0] ||
+        "Upload CV failed";
+
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
 
   const updateCv = async (id: number, file: File) => {
+    if (!file) return;
+
     setLoading(true);
 
     try {
@@ -49,9 +66,17 @@ export default function useCv() {
 
       await cvService.updateCv(id, formData);
 
+      toast.success("Update CV success ✏️");
+
       await infoCv();
-    } catch (error) {
+    } catch (error: any) {
       console.log("UPDATE ERROR:", error);
+
+      const msg =
+        error?.response?.data?.errors?.cv?.[0] ||
+        "Update CV failed";
+
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -63,9 +88,12 @@ export default function useCv() {
     try {
       await cvService.deleteCv(id);
 
+      toast.success("Delete CV success 🗑️");
+
       await infoCv();
     } catch (error) {
       console.log("DELETE ERROR:", error);
+      toast.error("Delete CV failed");
     } finally {
       setLoading(false);
     }

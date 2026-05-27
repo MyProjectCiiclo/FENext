@@ -2,23 +2,11 @@ import api from "@/lib/api";
 
 export const cvService = {
   async sendCv(formData: FormData) {
-    return await api.post("/cv/create-cv", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    return await api.post("/cv/create-cv", formData);
   },
 
   async updateCv(id: number, formData: FormData) {
-    return await api.post(
-      `/cv/update-cv/${id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    return await api.post(`/cv/update-cv/${id}`, formData);
   },
 
   async getCv() {

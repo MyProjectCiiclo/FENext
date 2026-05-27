@@ -1,10 +1,10 @@
 import { workService } from "@/services";
-import { WorkExperience } from "@/types";
+import { WorkYearGroup } from "@/types";
 import { useState } from "react";
 
 export function useWork() {
   const [loading, setLoading] = useState(false);
-  const [work, setWork] = useState<WorkExperience[]>([]);
+  const [work, setWork] = useState<WorkYearGroup[]>([]);
 
   const getWork = async () => {
     setLoading(true);
@@ -14,6 +14,7 @@ export function useWork() {
       setWork(res || []);
     } catch (err) {
       console.log(err);
+      setWork([]);
     } finally {
       setLoading(false);
     }
