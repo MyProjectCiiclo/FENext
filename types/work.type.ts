@@ -1,11 +1,16 @@
 export interface WorkExperience {
-  id: string;
+   id: number;
   title: string;
   company: string;
-  logo?: string;
   description: string;
-  startDate: string;
-  endDate: string;
+  date_range: string;
+  years: number;
+  logo: string;
+}
 
-  date_range?: string; 
+
+export interface WorkYearGroup {
+  year: number;
+  total: number;
+  work_experiences: WorkExperience[];
 }

@@ -1,10 +1,10 @@
 import { EducationService } from "@/services";
 import { useState } from "react";
+import { Education, UpdateEducationDTO } from "@/types";
 
 export function useEducation() {
-  const [edu, setEdu] = useState<any[]>([]);
+  const [edu, setEdu] = useState<Education[]>([]);
 
-  // GET
   const getEdu = async () => {
     try {
       const res = await EducationService.getEdu();
@@ -14,8 +14,7 @@ export function useEducation() {
     }
   };
 
-  // CREATE
-  const sendEdu = async (data: any) => {
+  const sendEdu = async (data: UpdateEducationDTO) => {
     try {
       const res = await EducationService.sendEdu(data);
       return res.data;
@@ -25,13 +24,14 @@ export function useEducation() {
     }
   };
 
-  // UPDATE (FIXED)
-  const updateEdu = async (id: number, data: any) => {
+  const updateEdu = async (id: number, data: UpdateEducationDTO) => {
     try {
       const res = await EducationService.updateEdu(id, data);
 
       setEdu((prev) =>
-        prev.map((item) => (Number(item.id) === Number(id) ? res.data : item)),
+        prev.map((item) =>
+          item.id === id ? res.data : item
+        )
       );
 
       return res.data;
@@ -40,7 +40,6 @@ export function useEducation() {
     }
   };
 
-  // DELETE (FIXED)
   const deleteEdu = async (id: number) => {
     try {
       await EducationService.deleteEdu(id);

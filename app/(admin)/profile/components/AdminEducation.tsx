@@ -1,7 +1,9 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+
 import EducationCard from "./EducationCard";
+
 import { useEducation } from "@/hooks/useEducation";
 import { useCourse } from "@/hooks/useCourse";
 
@@ -23,114 +25,152 @@ type EducationType = {
 
 export default function AdminEducation() {
   const { edu, getEdu, updateEdu, deleteEdu } = useEducation();
-  const { createCourse, deleteCourse } = useCourse();
 
-  const [educations, setEducations] = useState<EducationType[]>([]);
+  const { createCourse, deleteCourse, updateCourse } = useCourse();
+
   const [editId, setEditId] = useState<number | null>(null);
+
+  const [localEdu, setLocalEdu] = useState<EducationType[]>([]);
+
   const [newCourse, setNewCourse] = useState<Record<number, string>>({});
 
-  // =========================
-  // LOAD DATA
-  // =========================
   useEffect(() => {
     getEdu();
-  }, [getEdu]);
+  }, []);
 
   useEffect(() => {
-    if (edu) setEducations(edu);
+    if (edu) {
+      setLocalEdu(edu);
+    }
   }, [edu]);
 
-  // =========================
-  // UPDATE FIELD
-  // =========================
   const handleChange = useCallback(
     (id: number, field: keyof EducationType, value: string) => {
-      setEducations((prev) =>
+      setLocalEdu((prev) =>
         prev.map((item) =>
-          item.id === id ? { ...item, [field]: value } : item
-        )
+          item.id === id
+            ? {
+                ...item,
+                [field]: value,
+              }
+            : item,
+        ),
       );
     },
-    []
+    [],
   );
 
-  // =========================
-  // DELETE EDUCATION
-  // =========================
   const handleDeleteEducation = useCallback(
     async (id: number) => {
       try {
         await deleteEdu(id);
-        setEducations((prev) => prev.filter((item) => item.id !== id));
+
+        setLocalEdu((prev) => prev.filter((item) => item.id !== id));
+
         setEditId(null);
+      } catch (err) {
+        console.log("DELETE EDUCATION ERROR:", err);
+      }
+    },
+    [deleteEdu],
+  );
+
+  const handleAddCourse = useCallback(
+    async (eduId: number) => {
+      const value = newCourse[eduId];
+
+      if (!value?.trim()) return;
+
+      try {
+        console.log("DATA SEND", {
+          education_id: eduId,
+          name: value,
+        });
+
+        const res = await createCourse({
+          education_id: eduId,
+          name: value,
+        });
+
+        console.log("CREATE RES", res);
+
+        setLocalEdu((prev) =>
+          prev.map((edu) =>
+            edu.id === eduId
+              ? {
+                  ...edu,
+                  courses: [...edu.courses, res],
+                }
+              : edu,
+          ),
+        );
+
+        setNewCourse((prev) => ({
+          ...prev,
+          [eduId]: "",
+        }));
       } catch (err) {
         console.log(err);
       }
     },
-    [deleteEdu]
+    [newCourse, createCourse],
   );
 
-  // =========================
-  // ADD COURSE (UI ONLY)
-  // =========================
-  const handleAddCourse = useCallback(
-    (id: number) => {
-      const value = newCourse[id];
-      if (!value?.trim()) return;
+  const handleUpdateCourse = useCallback(
+    async (eduId: number, courseId: number, name: string) => {
+      try {
+        const res = await updateCourse(courseId, {
+          name,
+        } as any);
 
-      setEducations((prev) =>
-        prev.map((edu) =>
-          edu.id === id
-            ? {
-                ...edu,
-                courses: [
-                  ...edu.courses,
-                  { id: Date.now(), name: value },
-                ],
-              }
-            : edu
-        )
-      );
-
-      setNewCourse((prev) => ({
-        ...prev,
-        [id]: "",
-      }));
+        setLocalEdu((prev) =>
+          prev.map((edu) =>
+            edu.id === eduId
+              ? {
+                  ...edu,
+                  courses: edu.courses.map((c) =>
+                    c.id === courseId ? res.data : c,
+                  ),
+                }
+              : edu,
+          ),
+        );
+      } catch (err) {
+        console.log("UPDATE COURSE ERROR:", err);
+      }
     },
-    [newCourse]
+    [updateCourse],
   );
 
-  // =========================
-  // DELETE COURSE (UI ONLY)
-  // =========================
   const handleDeleteCourse = useCallback(
-    (eduId: number, courseId: number) => {
-      setEducations((prev) =>
-        prev.map((edu) =>
-          edu.id === eduId
-            ? {
-                ...edu,
-                courses: edu.courses.filter((c) => c.id !== courseId),
-              }
-            : edu
-        )
-      );
+    async (eduId: number, courseId: number) => {
+      try {
+        await deleteCourse(courseId);
+
+        setLocalEdu((prev) =>
+          prev.map((edu) =>
+            edu.id === eduId
+              ? {
+                  ...edu,
+                  courses: edu.courses.filter((c) => c.id !== courseId),
+                }
+              : edu,
+          ),
+        );
+      } catch (err) {
+        console.log("DELETE COURSE ERROR:", err);
+      }
     },
-    []
+    [deleteCourse],
   );
 
-  // =========================
-  // SAVE ALL (SYNC DB)
-  // =========================
   const handleSave = useCallback(
     async (id: number) => {
-      const data = educations.find((item) => item.id === id);
+      const data = localEdu.find((item) => item.id === id);
+
       if (!data) return;
 
       try {
-        // =========================
-        // 1. UPDATE EDUCATION
-        // =========================
         await updateEdu(id, {
           school: data.school,
           degree: data.degree,
@@ -140,52 +180,17 @@ export default function AdminEducation() {
           description: data.description,
         });
 
-        // =========================
-        // 2. DELETE OLD COURSES (DB)
-        // =========================
-        const oldCourses =
-          edu.find((e) => e.id === id)?.courses || [];
-
-        await Promise.all(
-          oldCourses.map((course) =>
-            deleteCourse(course.id)
-          )
-        );
-
-        // =========================
-        // 3. CREATE NEW COURSES (DB)
-        // =========================
-        await Promise.all(
-          data.courses.map((course) =>
-            createCourse({
-              education_id: id,
-              name: course.name,
-            })
-          )
-        );
-
-        // =========================
-        // 4. REFRESH DATA
-        // =========================
-        await getEdu();
         setEditId(null);
       } catch (err) {
-        console.log("SAVE ERROR:", err);
+        console.log("SAVE EDUCATION ERROR:", err);
       }
     },
-    [
-      educations,
-      edu,
-      updateEdu,
-      getEdu,
-      deleteCourse,
-      createCourse,
-    ]
+    [localEdu, updateEdu],
   );
 
   return (
     <div className="space-y-10">
-      {educations.map((eduItem) => (
+      {localEdu.map((eduItem) => (
         <EducationCard
           key={eduItem.id}
           eduItem={eduItem}
@@ -193,9 +198,10 @@ export default function AdminEducation() {
           onChange={handleChange}
           onDeleteEducation={handleDeleteEducation}
           onAddCourse={handleAddCourse}
+          onUpdateCourse={handleUpdateCourse}
           onDeleteCourse={handleDeleteCourse}
           onSave={handleSave}
-          newCourseValue={newCourse[eduItem.id]}
+          newCourseValue={newCourse[eduItem.id] || ""}
           setNewCourseValue={setNewCourse}
           setEditId={setEditId}
         />

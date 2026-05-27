@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { CourseService } from "@/services";
+import { Course } from "@/types";
 
 export function useCourse() {
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
 
-  // CREATE
-  const createCourse = async (data: any) => {
+  const createCourse = async (data: Course) => {
     try {
       const res = await CourseService.createCourse(data);
 
@@ -18,7 +18,6 @@ export function useCourse() {
     }
   };
 
-  // DELETE
   const deleteCourse = async (id: number) => {
     try {
       await CourseService.deleteCourse(id);
@@ -29,16 +28,17 @@ export function useCourse() {
       throw err;
     }
   };
-
-  // UPDATE
-  const updateCourse = async (id: number, data: any) => {
+  
+  const updateCourse = async (id: number, data: Course) => {
     try {
       const res = await CourseService.updateCourse(id, data);
+
+    console.log("🔥 RESPONSE FULL:", res);
+    console.log("🔥 RESPONSE DATA:", res?.data);
 
       setCourses((prev) =>
         prev.map((item) => (item.id === id ? res.data : item)),
       );
-
       return res.data;
     } catch (err) {
       console.log(err);

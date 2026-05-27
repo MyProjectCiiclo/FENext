@@ -1,4 +1,5 @@
 import api from "@/lib/api";
+import { UpdateEducationDTO } from "@/types";
 
 export const EducationService = {
   async getEdu() {
@@ -10,7 +11,7 @@ export const EducationService = {
     }
   },
 
-  async sendEdu(data: any) {
+  async sendEdu(data: UpdateEducationDTO) {
     try {
       const res = await api.post("/educations/create-educations", data);
       return res;
@@ -19,7 +20,7 @@ export const EducationService = {
     }
   },
 
-  async updateEdu(id: number, data: any) {
+  async updateEdu(id: number, data: UpdateEducationDTO) {
     try {
       const res = await api.put(`/educations/update-educations/${id}`, data);
       return res;

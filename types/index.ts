@@ -7,3 +7,4 @@ export * from "./github.type";
 export * from "./profile.type";
 export * from "./education.type";
 export * from "./course.type";
+export * from "./rating.type";

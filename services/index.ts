@@ -6,3 +6,4 @@ export * from "./github.service";
 export * from "./user.service";
 export * from "./education.service";
 export * from "./course.service";
+export * from "./rating.service";
