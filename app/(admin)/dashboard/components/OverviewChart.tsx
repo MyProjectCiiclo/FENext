@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -7,21 +8,31 @@ import {
   CartesianGrid,
   XAxis,
   YAxis,
+  Tooltip,
 } from "recharts";
 
-const data = [
-  { month: "Jan", contributions: 120 },
-  { month: "Feb", contributions: 80 },
-  { month: "Mar", contributions: 150 },
-  { month: "Apr", contributions: 100 },
-  { month: "May", contributions: 170 },
-  { month: "Jun", contributions: 140 },
-];
+import { useGithub } from "@/hooks/useGithub";
 
 export default function OverviewChart() {
+  const { contributions, getGithub } = useGithub();
+
+  useEffect(() => {
+    getGithub();
+  }, []);
+
+  const chartData = useMemo(() => {
+    if (!contributions?.weeks) return [];
+
+    return contributions.weeks.flatMap((week) =>
+      week.contributionDays.map((day) => ({
+        date: day.date,
+        contributions: day.contributionCount,
+      }))
+    );
+  }, [contributions]);
+
   return (
     <div className="p-4 border border-pink-100 rounded-xl mt-5">
-      
       <div>
         <h3 className="text-sm font-semibold text-gray-900">
           Activity Overview
@@ -34,7 +45,7 @@ export default function OverviewChart() {
 
       <div className="h-[300px] w-full mt-4">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart data={chartData}>
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
@@ -42,25 +53,21 @@ export default function OverviewChart() {
             />
 
             <XAxis
-              dataKey="month"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 12, fill: "#6B7280" }}
+              dataKey="date"
+              tick={{ fontSize: 11 }}
+              tickFormatter={(value) => value.slice(5)} // chỉ lấy MM-DD
             />
 
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 12, fill: "#6B7280" }}
-            />
+            <YAxis />
+
+            <Tooltip />
 
             <Line
               type="monotone"
               dataKey="contributions"
               stroke="#2563EB"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "#2563EB" }}
-              activeDot={{ r: 6 }}
+              strokeWidth={2}
+              dot={false}
             />
           </LineChart>
         </ResponsiveContainer>
