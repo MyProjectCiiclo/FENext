@@ -14,6 +14,7 @@ import {
 import { useSkill } from "@/hooks/useSkill";
 import { useWork } from "@/hooks/useWork";
 import { Skill } from "@/types";
+import LoadingSpinner from "@/shared/Loading";
 
 export default function AnalyticsCharts() {
   const { skills, fetchSkills } = useSkill();
@@ -27,16 +28,31 @@ export default function AnalyticsCharts() {
   useEffect(() => {
     fetchSkills();
     getWork();
-  }, []);
+  }, [fetchSkills, getWork]);
 
   const safeSkills: Skill[] = Array.isArray(skills) ? skills : [];
 
-  const totalWeight = safeSkills.reduce(
+  const mergedSkills = Object.values(
+    safeSkills.reduce((acc, skill) => {
+      const key = skill.name.toLowerCase().trim();
+
+      if (!acc[key]) {
+        acc[key] = { ...skill };
+      } else {
+        acc[key].weight =
+          (acc[key].weight || 1) + (skill.weight || 1);
+      }
+
+      return acc;
+    }, {} as Record<string, Skill>)
+  );
+
+  const totalWeight = mergedSkills.reduce(
     (sum, s) => sum + (s.weight || 1),
     0
   );
 
-  const normalizedSkills = safeSkills.map((s) => ({
+  const normalizedSkills = mergedSkills.map((s) => ({
     ...s,
     percent: totalWeight ? ((s.weight || 1) / totalWeight) * 100 : 0,
   }));
@@ -48,9 +64,7 @@ export default function AnalyticsCharts() {
         .map((skill) => {
           const start = current;
           const end = current + skill.percent;
-
           current = end;
-
           return `${skill.color} ${start}% ${end}%`;
         })
         .join(",")
@@ -63,23 +77,24 @@ export default function AnalyticsCharts() {
       }))
     : [];
 
+  if (!workData.length || !normalizedSkills.length) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <section id="analytics-charts">
       <div className="flex gap-6 mt-6">
-
         <div className="border border-pink-100 rounded-xl p-4 flex-1 flex flex-col">
           <div>
             <h3 className="text-pink-400 font-bold text-xl">
               SKILL DISTRIBUTION
             </h3>
-
             <p className="text-gray-400 italic text-sm">
               Overall development performance
             </p>
           </div>
 
           <div className="relative flex flex-col items-center mt-6 flex-1">
-
             <div
               className="w-[210px] h-[210px] rounded-full"
               style={{
@@ -124,7 +139,6 @@ export default function AnalyticsCharts() {
                 </div>
               ))}
             </div>
-
           </div>
         </div>
 
@@ -133,7 +147,6 @@ export default function AnalyticsCharts() {
             <h3 className="text-pink-400 font-bold text-xl">
               WORK EXPERIENCE
             </h3>
-
             <p className="text-gray-400 italic text-sm">
               Total projects by year
             </p>
@@ -146,7 +159,6 @@ export default function AnalyticsCharts() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-
                 <Bar
                   dataKey="totalProjects"
                   fill="#ec4899"
@@ -158,7 +170,6 @@ export default function AnalyticsCharts() {
             </ResponsiveContainer>
           </div>
         </div>
-
       </div>
     </section>
   );

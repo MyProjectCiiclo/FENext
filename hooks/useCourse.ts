@@ -1,6 +1,9 @@
 import { CourseService } from "@/services/course.service";
-import { Course } from "@/types/course.type";
+import {
+  Course,
+} from "@/types/course.type";
 import { useState } from "react";
+
 export function useCourse() {
   const [courses, setCourses] = useState<Course[]>([]);
 
@@ -12,7 +15,7 @@ export function useCourse() {
 
       return res.data;
     } catch (err) {
-      console.log(err);
+      console.log("CREATE COURSE ERROR:", err);
       throw err;
     }
   };
@@ -23,24 +26,22 @@ export function useCourse() {
 
       setCourses((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
-      console.log(err);
+      console.log("DELETE COURSE ERROR:", err);
       throw err;
     }
   };
-  
+
   const updateCourse = async (id: number, data: Course) => {
     try {
       const res = await CourseService.updateCourse(id, data);
 
-    console.log("🔥 RESPONSE FULL:", res);
-    console.log("🔥 RESPONSE DATA:", res?.data);
-
       setCourses((prev) =>
         prev.map((item) => (item.id === id ? res.data : item)),
       );
+
       return res.data;
     } catch (err) {
-      console.log(err);
+      console.log("UPDATE COURSE ERROR:", err);
       throw err;
     }
   };

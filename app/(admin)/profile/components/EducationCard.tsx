@@ -10,19 +10,7 @@ import {
   Save,
   Edit3,
 } from "lucide-react";
-
-type CourseType = {
-  id: number;
-  name: string;
-};
-
-type Education = {
-  id: number;
-  school: string;
-  major: string;
-  description: string;
-  courses: CourseType[];
-};
+import { Education } from "@/types/education.type";
 
 type EducationField =
   | "school"
@@ -63,10 +51,8 @@ const EducationCard = React.memo(function EducationCard({
 }: Props) {
   const [editingCourseId, setEditingCourseId] = useState<number | null>(null);
   const [courseName, setCourseName] = useState("");
-
   return (
     <section className="relative bg-white rounded-[32px] border border-pink-100 shadow-lg">
-      {/* HEADER */}
       <div className="absolute top-10 left-6 w-20 h-20 rounded-[32px] bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center z-10">
         <GraduationCap className="text-pink-500" size={36} />
       </div>
@@ -94,7 +80,6 @@ const EducationCard = React.memo(function EducationCard({
       </div>
 
       <div className="px-8 pb-8 pt-12">
-        {/* SCHOOL */}
         {isEditing ? (
           <input
             value={eduItem.school}
@@ -105,7 +90,6 @@ const EducationCard = React.memo(function EducationCard({
           <h2 className="mt-6 text-3xl font-bold">{eduItem.school}</h2>
         )}
 
-        {/* MAJOR */}
         {isEditing ? (
           <input
             value={eduItem.major}
@@ -116,7 +100,6 @@ const EducationCard = React.memo(function EducationCard({
           <p className="mt-3 text-pink-500 font-semibold">{eduItem.major}</p>
         )}
 
-        {/* DESCRIPTION */}
         {isEditing ? (
           <textarea
             value={eduItem.description}
@@ -129,7 +112,6 @@ const EducationCard = React.memo(function EducationCard({
           <p className="mt-6 text-gray-700">{eduItem.description}</p>
         )}
 
-        {/* COURSES */}
         <div className="mt-8">
           <h3 className="font-semibold mb-4">Courses</h3>
 
@@ -149,7 +131,6 @@ const EducationCard = React.memo(function EducationCard({
                   <span>{course.name}</span>
                 )}
 
-                {/* EDIT */}
                 {isEditing && (
                   <button
                     onClick={() => {
@@ -161,7 +142,6 @@ const EducationCard = React.memo(function EducationCard({
                   </button>
                 )}
 
-                {/* SAVE */}
                 {editingCourseId === course.id && (
                   <button
                     onClick={() => {
@@ -173,7 +153,6 @@ const EducationCard = React.memo(function EducationCard({
                   </button>
                 )}
 
-                {/* DELETE */}
                 {isEditing && (
                   <button onClick={() => onDeleteCourse(eduItem.id, course.id)}>
                     <X size={14} />
@@ -182,8 +161,6 @@ const EducationCard = React.memo(function EducationCard({
               </div>
             ))}
           </div>
-
-          {/* ADD COURSE */}
           {isEditing && (
             <div className="flex gap-3 mt-4">
               <input
@@ -198,7 +175,10 @@ const EducationCard = React.memo(function EducationCard({
               />
 
               <button
-                onClick={() => onAddCourse(eduItem.id)}
+                onClick={() => {
+                  console.log("CLICK BUTTON");
+                  onAddCourse(eduItem.id);
+                }}
                 className="bg-pink-500 text-white px-5 rounded-2xl"
               >
                 <Plus size={18} />
@@ -206,7 +186,6 @@ const EducationCard = React.memo(function EducationCard({
             </div>
           )}
 
-          {/* SAVE EDUCATION */}
           {isEditing && (
             <button
               onClick={() => onSave(eduItem.id)}
