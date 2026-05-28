@@ -21,11 +21,6 @@ export default function ProfilePage() {
     <section className="bg-white rounded-[32px] overflow-hidden border border-pink-100 shadow-[0_10px_40px_rgba(255,105,180,0.08)] relative">
 
       <div className="relative h-20 bg-gradient-to-r from-pink-500 via-pink-400 to-rose-300">
-        <button
-          onClick={() => setEdit(!edit)}
-          className="absolute top-5 right-5 px-5 py-2 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center gap-2 text-white"
-        >
-        </button>
       </div>
 
       <div className="px-8 pb-10 relative">

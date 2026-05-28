@@ -1,6 +1,6 @@
 "use client";
 
-import { GraduationCap } from "lucide-react";
+import { Award, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -28,12 +28,12 @@ type ActiveSection =
   | "analytics"
   | "management"
   | "contactManagement"
-  | "ratingManagement";
+  | "ratingManagement"
+  | "skillManagement";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
   const { user, getUser } = useUser();
 
   useEffect(() => {
@@ -41,7 +41,6 @@ export default function Sidebar() {
   }, []);
 
   const tab = searchParams.get("tab");
-
   const hash = typeof window !== "undefined" ? window.location.hash : "";
 
   const isAnalytics = pathname === "/dashboard" && hash === "#analytics-charts";
@@ -64,9 +63,12 @@ export default function Sidebar() {
                 : pathname.startsWith("/management") &&
                     tab === "managementRating"
                   ? "ratingManagement"
-                  : pathname.startsWith("/management")
-                    ? "management"
-                    : "dashboard";
+                  : pathname.startsWith("/management") &&
+                      tab === "managementSkill"
+                    ? "skillManagement"
+                    : pathname.startsWith("/management")
+                      ? "management"
+                      : "dashboard";
 
   const navItemClass = (active: boolean) =>
     `flex items-center gap-3 p-3 rounded-lg transition ${
@@ -78,10 +80,8 @@ export default function Sidebar() {
       <div>
         <div className="flex items-center gap-3 mb-8">
           <FaChartPie className="text-pink-400" size={20} />
-
           <div>
             <h1 className="font-bold text-lg text-pink-400">MyDash</h1>
-
             <p className="text-[#6d4b59]">Profile Manager</p>
           </div>
         </div>
@@ -92,7 +92,6 @@ export default function Sidebar() {
             className={navItemClass(activeSection === "dashboard")}
           >
             <FaChartPie className="text-pink-400" />
-
             <span className="text-[#6d4b59]">Dashboard</span>
           </Link>
 
@@ -101,7 +100,6 @@ export default function Sidebar() {
             className={navItemClass(activeSection === "profile")}
           >
             <FaUser className="text-pink-400" />
-
             <span className="text-[#6d4b59]">Profile</span>
           </Link>
 
@@ -112,7 +110,6 @@ export default function Sidebar() {
                 className={navItemClass(activeSection === "profile")}
               >
                 <FaUser size={14} className="text-pink-400" />
-
                 <span className="text-[#6d4b59]">Personal</span>
               </Link>
 
@@ -121,7 +118,6 @@ export default function Sidebar() {
                 className={navItemClass(activeSection === "profileEducation")}
               >
                 <GraduationCap size={14} className="text-pink-400" />
-
                 <span className="text-[#6d4b59]">Education</span>
               </Link>
 
@@ -130,7 +126,6 @@ export default function Sidebar() {
                 className={navItemClass(activeSection === "cvProjects")}
               >
                 <FaFileAlt size={14} className="text-pink-400" />
-
                 <span className="text-[#6d4b59]">CV & Projects</span>
               </Link>
             </div>
@@ -141,7 +136,6 @@ export default function Sidebar() {
             className={navItemClass(activeSection === "management")}
           >
             <FaTasks className="text-pink-400" />
-
             <span className="text-[#6d4b59]">Management</span>
           </Link>
 
@@ -152,7 +146,6 @@ export default function Sidebar() {
                 className={navItemClass(activeSection === "contactManagement")}
               >
                 <FaEnvelope size={14} className="text-pink-400" />
-
                 <span className="text-[#6d4b59]">Contact</span>
               </Link>
 
@@ -161,8 +154,15 @@ export default function Sidebar() {
                 className={navItemClass(activeSection === "ratingManagement")}
               >
                 <FaStar size={14} className="text-pink-400" />
-
                 <span className="text-[#6d4b59]">Rating</span>
+              </Link>
+
+              <Link
+                href="/management?tab=managementSkill"
+                className={navItemClass(activeSection === "skillManagement")}
+              >
+                <Award size={14} className="text-pink-400" />
+                <span className="text-[#6d4b59]">Skill</span>
               </Link>
             </div>
           )}
@@ -172,7 +172,6 @@ export default function Sidebar() {
             className={navItemClass(activeSection === "analytics")}
           >
             <FaChartLine className="text-pink-400" size={20} />
-
             <span className="text-[#6d4b59]">Analytics</span>
           </Link>
 
@@ -181,7 +180,6 @@ export default function Sidebar() {
             className={navItemClass(activeSection === "settings")}
           >
             <FaCog className="text-pink-400" />
-
             <span className="text-[#6d4b59]">Settings</span>
           </Link>
         </nav>
@@ -189,15 +187,11 @@ export default function Sidebar() {
 
       <div>
         <div className="flex items-center gap-3 border border-[#6d4b59] p-3 rounded-lg mb-4">
-          <div className="w-10 h-10 flex items-center justify-center rounded-full">
-            <FaUser className="text-pink-400" size={20} />
-          </div>
-
+          <FaUser className="text-pink-400" size={20} />
           <div>
             <p className="text-sm font-semibold text-pink-400">
               {user?.name || "Loading..."}
             </p>
-
             <p className="text-[#6d4b59] text-sm break-all">
               {user?.email || "Loading..."}
             </p>

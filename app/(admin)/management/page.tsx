@@ -1,6 +1,7 @@
 import AdminLayout from "../AdminLayout";
 import ContactManagement from "./components/ContactManagement";
 import RatingManagement from "./components/RatingManagement";
+import SkillManagement from "./components/SkillManagement";
 
 type Props = {
   searchParams: Promise<{
@@ -17,6 +18,8 @@ export default async function ManagementPage({ searchParams }: Props) {
       {tab === "managementContact" && <ContactManagement />}
 
       {tab === "managementRating" && <RatingManagement />}
+
+      {tab === "managementSkill" && <SkillManagement />}
     </AdminLayout>
   );
 }
