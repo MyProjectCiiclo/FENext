@@ -1,30 +1,18 @@
+"use client";
 
-import { skillService } from "@/services";
-import { Profile } from "@/types";
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import { skillService  } from "@/services";
 
 export function useAbout() {
-  const [loading, setLoading] = useState(false);
-  const [about, setAbout] = useState<Profile | null>(null);
-
-  const getAbout = async () => {
-    setLoading(true);
-
-    try {
-      const res = await skillService.getSkills();
-      setAbout(res.data.data);
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const query = useQuery({
+    queryKey: ["about"],
+    queryFn: skillService .getSkills,
+    staleTime: 1000 * 60 * 5,
+  });
 
   return {
-    loading,
-    about,
-    getAbout,
+    about: query.data,
+    loading: query.isLoading,
+    error: query.error,
   };
 }

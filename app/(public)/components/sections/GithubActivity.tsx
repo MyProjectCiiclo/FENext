@@ -1,37 +1,39 @@
 "use client";
 
-import { useGithub } from "@/hooks/useGithub";
-import { useEffect } from "react";
+import { useMemo } from "react";
+import { useGithub } from "@/hooks";
+import { ContributionWeek } from "@/types";
 
 export default function GithubActivity() {
-  const { loading, githubUser, contributions, getGithub } = useGithub();
+  const { loading, githubUser, contributions } = useGithub();
 
-  useEffect(() => {
-    getGithub();
-  }, []);
+  const weeks: ContributionWeek[] = contributions?.weeks ?? [];
 
-  const weeks = contributions?.weeks ?? [];
+  const monthLabels = useMemo(() => {
+    const labels: { month: string; index: number }[] = [];
 
-  const monthLabels: { month: string; index: number }[] = [];
+    weeks.forEach((week, index) => {
+      const firstDay = week.contributionDays?.[0];
+      if (!firstDay) return;
 
-  weeks.forEach((week, index) => {
-    const firstDay = week.contributionDays?.[0];
-    if (!firstDay) return;
+      const date = new Date(firstDay.date);
+      const month = date.toLocaleString("default", { month: "short" });
 
-    const date = new Date(firstDay.date);
-    const month = date.toLocaleString("default", { month: "short" });
+      if (
+        labels.length === 0 ||
+        labels[labels.length - 1].month !== month
+      ) {
+        labels.push({ month, index });
+      }
+    });
 
-    if (
-      monthLabels.length === 0 ||
-      monthLabels[monthLabels.length - 1].month !== month
-    ) {
-      monthLabels.push({ month, index });
-    }
-  });
+    return labels;
+  }, [weeks]);
 
   return (
     <section className="bg-[#FDF0F5] px-6 lg:px-[180px] py-12 flex justify-center">
       <div className="w-full">
+
         <div className="flex justify-center mb-10">
           <div className="relative bg-[#f8d9e5] text-pink-500 px-6 py-2 rounded-xl font-semibold">
             Github Activity
@@ -67,13 +69,14 @@ export default function GithubActivity() {
         ) : (
           <div className="overflow-x-auto">
             <div className="min-w-[900px]">
+
               <div className="grid grid-flow-col mb-2">
                 {weeks.map((_, i) => {
                   const label = monthLabels.find((m) => m.index === i);
 
                   return (
                     <div key={i} className="w-4 text-[10px] text-gray-500">
-                      {label ? label.month : ""}
+                      {label?.month ?? ""}
                     </div>
                   );
                 })}
@@ -96,19 +99,19 @@ export default function GithubActivity() {
                         title={`${day.date} - ${day.contributionCount}`}
                       />
                     );
-                  }),
+                  })
                 )}
               </div>
+
               <div className="flex items-center justify-end gap-2 mt-4 text-xs text-gray-500">
                 <span>Less</span>
-
                 <div className="w-3 h-3 rounded-sm bg-[#ebedf0]" />
                 <div className="w-3 h-3 rounded-sm bg-[#f9a8d4]" />
                 <div className="w-3 h-3 rounded-sm bg-[#f472b6]" />
                 <div className="w-3 h-3 rounded-sm bg-[#ec4899]" />
-
                 <span>More</span>
               </div>
+
             </div>
           </div>
         )}

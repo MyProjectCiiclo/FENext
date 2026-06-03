@@ -1,73 +1,64 @@
-import { useState } from "react";
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { contactService } from "@/services";
 import { Contact } from "@/types";
 
 export function useContact() {
-  const [loading, setLoading] = useState(false);
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [totalContacts, setTotalContacts] = useState(0);
+  const queryClient = useQueryClient();
 
-  const sendContact = async (payload: Contact) => {
-    setLoading(true);
-
-    try {
-      await contactService.sendContact(payload);
-      toast.success("Send success!");
-    } catch (err) {
-      console.log(err);
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getContact = async () => {
-    setLoading(true);
-
-    try {
+  const query = useQuery({
+    queryKey: ["contacts"],
+    queryFn: async () => {
       const res = await contactService.getContact();
 
-      const data = res?.data?.data;
+      return res?.data?.data?.data ?? [];
+    },
+    staleTime: 1000 * 60 * 5,
+  });
 
-      setContacts(data?.data ?? []);
-      setTotalContacts(data?.totalContacts ?? 0);
-    } catch (err) {
+  const sendMutation = useMutation({
+    mutationFn: (payload: Contact) =>
+      contactService.sendContact(payload),
+
+    onSuccess: () => {
+      toast.success("Send success!");
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    },
+
+    onError: (err) => {
       console.log(err);
       toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
-  const deleteContact = async (id: number) => {
-    setLoading(true);
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => contactService.deleteContact(id),
 
-    try {
-      await contactService.deleteContact(id);
-
-      setContacts((prev) =>
-        prev.filter((contact) => contact.id !== id)
-      );
-
-      setTotalContacts((prev) => prev - 1);
-
+    onSuccess: () => {
       toast.success("Delete success!");
-    } catch (err) {
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    },
+
+    onError: (err) => {
       console.log(err);
       toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
   return {
-    sendContact,
-    getContact,
-    deleteContact,
+    contacts: query.data ?? [],
 
-    loading,
-    contacts,
-    totalContacts,
+    totalContacts: 0,
+
+    loading: query.isLoading,
+    error: query.error,
+
+    sendContact: sendMutation.mutate,
+    deleteContact: deleteMutation.mutate,
+
+    isSending: sendMutation.isPending,
+    isDeleting: deleteMutation.isPending,
   };
 }

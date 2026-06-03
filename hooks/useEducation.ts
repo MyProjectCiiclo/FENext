@@ -1,60 +1,114 @@
+"use client";
+
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { EducationService } from "@/services";
-import { useState } from "react";
 import { Education, UpdateEducationDTO } from "@/types";
+import toast from "react-hot-toast";
 
 export function useEducation() {
-  const [edu, setEdu] = useState<Education[]>([]);
+  const queryClient = useQueryClient();
 
-  const getEdu = async () => {
-    try {
+  const query = useQuery<Education[]>({
+    queryKey: ["education"],
+    queryFn: async () => {
       const res = await EducationService.getEdu();
-      setEdu(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const sendEdu = async (data: UpdateEducationDTO) => {
-    try {
+      return res.data ?? [];
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+  const createEdu = useMutation({
+    mutationFn: async (data: UpdateEducationDTO) => {
       const res = await EducationService.sendEdu(data);
-      return res.data;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  };
+      return res.data as Education;
+    },
 
-  const updateEdu = async (id: number, data: UpdateEducationDTO) => {
-    try {
+    onSuccess: (newItem) => {
+      queryClient.setQueryData<Education[]>(["education"], (old = []) => [
+        ...old,
+        newItem,
+      ]);
+
+      toast.success("Education created successfully");
+    },
+  });
+
+  const updateEdu = useMutation({
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: UpdateEducationDTO;
+    }) => {
       const res = await EducationService.updateEdu(id, data);
+      return res.data as Education;
+    },
 
-      setEdu((prev) =>
-        prev.map((item) =>
-          item.id === id ? res.data : item
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["education"] });
+
+      const prev = queryClient.getQueryData<Education[]>(["education"]);
+
+      queryClient.setQueryData<Education[]>(["education"], (old = []) =>
+        old.map((item) =>
+          item.id === id ? { ...item, ...data } : item
         )
       );
 
-      return res.data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      return { prev };
+    },
 
-  const deleteEdu = async (id: number) => {
-    try {
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(["education"], context?.prev);
+    },
+
+    onSuccess: () => {
+      toast.success("Education updated successfully");
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["education"] });
+    },
+  });
+
+  const deleteEdu = useMutation({
+    mutationFn: async (id: number) => {
       await EducationService.deleteEdu(id);
+      return id;
+    },
 
-      setEdu((prev) => prev.filter((item) => item.id !== id));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["education"] });
+
+      const prev = queryClient.getQueryData<Education[]>(["education"]);
+
+      queryClient.setQueryData<Education[]>(["education"], (old = []) =>
+        old.filter((item) => item.id !== id)
+      );
+
+      return { prev };
+    },
+
+    onError: (_err, _id, context) => {
+      queryClient.setQueryData(["education"], context?.prev);
+    },
+
+    onSuccess: () => {
+      toast.success("Education deleted successfully");
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["education"] });
+    },
+  });
 
   return {
-    edu,
-    getEdu,
-    sendEdu,
-    updateEdu,
-    deleteEdu,
+    edu: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error,
+
+    createEdu,
+    updateEdu: updateEdu.mutate,
+    deleteEdu: deleteEdu.mutate,
   };
 }

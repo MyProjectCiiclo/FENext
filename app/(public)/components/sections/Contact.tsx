@@ -1,51 +1,87 @@
 "use client";
 
 import { Mail, Phone, MapPin } from "lucide-react";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { Eye } from "lucide-react";
 import { useContact } from "@/hooks/useContact";
-import { useEffect, useState } from "react";
-import { ContactForm } from "@/types";
-import { useAbout } from "@/hooks/useAbout";
+import { useState } from "react";
+import { useProfile, useCv } from "@/hooks";
+import type { Contact } from "@/types";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+
 export default function Contact() {
-  const { sendContact, loading } = useContact();
-  const { about, getAbout } = useAbout();
-  const [formData, setFormData] = useState<ContactForm>({
+  const { sendContact } = useContact();
+  const { profile } = useProfile();
+  const { cv } = useCv();
+
+  const latestCv = cv?.[0];
+
+  const [viewUrl, setViewUrl] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState<Contact>({
+    id: 0,
     name: "",
     email: "",
     message: "",
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = (e: any) => {
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmit = async (e: any) => {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("SUBMIT OK");
     await sendContact(formData);
 
     setFormData({
+      id: 0,
       name: "",
       email: "",
       message: "",
     });
   };
-  useEffect(() => {
-    getAbout();
-  }, []);
+
+  const getCvUrl = (path?: string) => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    return `${BASE_URL}/${path}`;
+  };
+
+  const handleView = (url?: string) => {
+    if (!url) return;
+
+    const fileUrl = getCvUrl(url);
+    setViewUrl(fileUrl);
+  };
+
+  const handleDownload = (url?: string) => {
+    if (!url) return;
+
+    const fileUrl = getCvUrl(url);
+    const downloadUrl = fileUrl.replace("/upload/", "/upload/fl_attachment/");
+
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.setAttribute("download", "");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <section id="contact" className=" bg-[#FDF0F5] px-6 py-20 lg:px-[180px]">
+    <section id="contact" className="bg-[#FDF0F5] px-6 py-10 lg:px-[180px]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <div className="relative inline-block bg-[#f8d9e5] text-pink-400 px-8 py-3 rounded-xl text-lg font-semibold mb-6">
+          <div className="inline-block bg-[#f8d9e5] text-pink-400 px-8 py-3 rounded-xl text-lg font-semibold mb-6">
             Contact Me
-            <span className="hidden md:block absolute top-1/2 right-full w-28 h-[1px] bg-pink-200 mr-4"></span>
-            <span className="hidden md:block absolute top-1/2 left-full w-28 h-[1px] bg-pink-200 ml-4"></span>
           </div>
 
           <h2 className="text-2xl lg:text-3xl font-bold text-pink-400 mb-5">
@@ -59,95 +95,123 @@ export default function Contact() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="bg-white/70 backdrop-blur-md border border-pink-100 p-8 rounded-[32px] shadow-[0_10px_40px_rgba(244,114,182,0.12)]">
+          <div className="bg-white/70 backdrop-blur-md border border-pink-100 p-8 rounded-[32px]">
             <h2 className="text-2xl font-bold mb-8 text-[#6d4b59]">
               Get in Touch
             </h2>
 
             <div className="space-y-5 text-[#7b5a68]">
+              <a href={`tel:${profile?.phone}`} className="flex gap-2 items-center">
+                <Phone size={18} />
+                {profile?.phone}
+              </a>
+
               <a
-                href="https://mail.google.com/mail/?view=cm&fs=1&to=hokimthanh1234@gmail.com"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  profile?.location || "",
+                )}`}
                 target="_blank"
-                rel="noreferrer"
-                className="flex gap-2 items-center block hover:text-pink-400 duration-300"
+                rel="noopener noreferrer"
+                className="flex gap-2 items-center"
               >
+                <MapPin size={18} />
+                {profile?.location}
+              </a>
+
+              <a href={`mailto:${profile?.email}`} className="flex gap-2 items-center">
                 <Mail size={18} />
-                {about?.email}
+                {profile?.email}
               </a>
 
-              <a
-                href="tel:0335044593"
-                className="flex gap-2 items-center block hover:text-pink-400 duration-300"
-              >
-                <Phone />
-                0335044593
+              <a href={profile?.linkedin} target="_blank" className="flex gap-2 items-center">
+                <FaLinkedin />
+                LinkedIn
               </a>
 
-              <a
-                href="https://www.google.com/maps?q=Da+Nang+Vietnam"
-                target="_blank"
-                rel="noreferrer"
-                className="flex gap-2 items-center block hover:text-pink-400 duration-300"
-              >
-                <MapPin />
-                Da Nang, Vietnam
-              </a>
-
-              <a
-                href="https://github.com/KimThanh1801"
-                target="_blank"
-                rel="noreferrer"
-                className="flex gap-2 items-center block hover:text-pink-400 duration-300"
-              >
+              <a href={profile?.github} target="_blank" className="flex gap-2 items-center">
                 <FaGithub />
-                {about?.github}
+                GitHub
               </a>
+            </div>
+
+            <div className="mt-10 border-t pt-6 space-y-4 text-[#6d4b59]">
+              <h3 className="text-lg font-semibold">CV</h3>
+
+              <p>{profile?.full_name}</p>
+
+              <div className="flex gap-4">
+                <button
+                  disabled={!latestCv?.cv}
+                  onClick={() => handleView(latestCv?.cv)}
+                  className="px-5 py-2 bg-pink-400 text-white rounded-xl font-semibold disabled:opacity-50 flex items-center gap-2"
+                >
+                  <Eye size={14} />
+                  View CV
+                </button>
+
+                <button
+                  disabled={!latestCv?.cv}
+                  onClick={() => handleDownload(latestCv?.cv)}
+                  className="px-5 py-2 border border-pink-400 text-pink-400 rounded-xl font-semibold disabled:opacity-50"
+                >
+                  Download CV
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-md border border-pink-100 p-8 rounded-[32px] shadow-[0_10px_40px_rgba(244,114,182,0.12)]">
+          <div className="bg-white/70 backdrop-blur-md border border-pink-100 p-8 rounded-[32px]">
             <h2 className="text-2xl font-bold mb-8 text-[#6d4b59]">
               Send Message
             </h2>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
               <input
-                type="text"
-                placeholder="Your Name"
-                className="w-full p-4 rounded-2xl bg-[#fde7ef] border border-pink-100 text-[#6d4b59] placeholder-[#b88999] outline-none focus:ring-4 focus:ring-pink-200"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                placeholder="Your Name"
+                className="w-full p-4 rounded-2xl bg-[#fde7ef]"
               />
 
               <input
-                type="email"
-                placeholder="Your Email"
-                className="w-full p-4 rounded-2xl bg-[#fde7ef] border border-pink-100 text-[#6d4b59] placeholder-[#b88999] outline-none focus:ring-4 focus:ring-pink-200"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                placeholder="Your Email"
+                className="w-full p-4 rounded-2xl bg-[#fde7ef]"
               />
 
               <textarea
-                rows={5}
-                placeholder="Your Message"
-                className="w-full p-4 rounded-2xl bg-[#fde7ef] border border-pink-100 text-[#6d4b59] placeholder-[#b88999] outline-none resize-none focus:ring-4 focus:ring-pink-200"
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
+                placeholder="Your Message"
+                className="w-full p-4 rounded-2xl bg-[#fde7ef]"
               />
 
-              <button
-                type="submit"
-                className="w-full bg-pink-400 text-white py-4 rounded-2xl font-semibold hover:bg-pink-500 hover:scale-[1.01] duration-300 shadow-[0_10px_25px_rgba(244,114,182,0.25)]"
-              >
+              <button className="w-full bg-pink-400 text-white py-4 rounded-2xl font-semibold">
                 Send Message
               </button>
             </form>
           </div>
         </div>
       </div>
+
+      {viewUrl && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white w-[85%] h-[90%] rounded-xl relative">
+            <button
+              onClick={() => setViewUrl(null)}
+              className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded"
+            >
+              Close
+            </button>
+
+            <iframe src={viewUrl} className="w-full h-full" />
+          </div>
+        </div>
+      )}
     </section>
   );
 }

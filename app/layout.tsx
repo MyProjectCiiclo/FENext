@@ -1,5 +1,5 @@
-import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import Providers from "./providers";
 
 export default function RootLayout({
   children,
@@ -7,10 +7,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="mdl-js">
+    <html lang="en" trancy-version="7.8.6" className="mdl-js">
       <body>
-        {children}
-        <Toaster position="top-right" />
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

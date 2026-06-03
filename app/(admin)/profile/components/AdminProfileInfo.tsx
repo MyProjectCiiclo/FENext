@@ -5,19 +5,13 @@ import Image from "next/image";
 import { Pencil, Camera, Phone, MapPin } from "lucide-react";
 import React from "react";
 
-import { useProfile } from "@/hooks/useProfile";
-import { useGithub } from "@/hooks/useGithub";
-import { useRating } from "@/hooks/useRating";
-import { useContact } from "@/hooks/useContact";
+import { useProfile } from "@/hooks";
 import LoadingSpinner from "@/shared/Loading";
 
 export default function AdminProfileInfo() {
   const [editMode, setEditMode] = useState(false);
 
-  const { profile, getProfile, updateProfile } = useProfile();
-  const { getGithub } = useGithub();
-  const { getRating } = useRating();
-  const { getContact } = useContact();
+  const { profile, updateProfile, loading } = useProfile();
 
   const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -30,39 +24,32 @@ export default function AdminProfileInfo() {
     description: "",
     phone: "",
     location: "",
+    github: "",
+    linkedin: "",
   });
-
-  useEffect(() => {
-    getProfile();
-    getGithub();
-    getRating();
-    getContact();
-  }, []);
 
   useEffect(() => {
     if (!profile) return;
 
     setForm({
-      full_name: profile.full_name ?? "",
-      title: profile.title ?? "",
-      description: profile.description ?? "",
-      phone: profile.phone ?? "",
-      location: profile.location ?? "",
+      full_name: profile?.full_name ?? "",
+      title: profile?.title ?? "",
+      description: profile?.description ?? "",
+      phone: profile?.phone ?? "",
+      location: profile?.location ?? "",
+      github: profile?.github ?? "",
+      linkedin: profile?.linkedin ?? "",
     });
   }, [profile]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-
     if (!file) return;
 
     setAvatarFile(file);
@@ -77,26 +64,24 @@ export default function AdminProfileInfo() {
     formData.append("description", form.description);
     formData.append("phone", form.phone);
     formData.append("location", form.location);
+    formData.append("github", form.github);
+    formData.append("linkedin", form.linkedin);
 
     if (avatarFile) {
       formData.append("avatar", avatarFile);
     }
 
-    try {
-      await updateProfile(formData);
-      await getProfile();
+    await updateProfile(formData);
 
-      setEditMode(false);
-      setAvatarFile(null);
-      setAvatarPreview(null);
-    } catch (err) {
-      console.log("UPDATE PROFILE ERROR:", err);
-    }
+    setEditMode(false);
+    setAvatarFile(null);
+    setAvatarPreview(null);
   };
 
-  const avatarSrc = avatarPreview || profile?.avatar || "/default-project.png";
-
+  if (loading) return <LoadingSpinner />;
   if (!profile) return <LoadingSpinner />;
+
+  const avatarSrc = avatarPreview || profile?.avatar || "/default-project.png";
 
   return (
     <section className="relative overflow-hidden rounded-[32px] border border-pink-100 bg-white shadow-sm">
@@ -143,7 +128,6 @@ export default function AdminProfileInfo() {
         <div className="mt-1 flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-gray-700">Full Name</label>
-
             {editMode ? (
               <input
                 name="full_name"
@@ -158,7 +142,6 @@ export default function AdminProfileInfo() {
 
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-gray-700">Title</label>
-
             {editMode ? (
               <input
                 name="title"
@@ -173,7 +156,6 @@ export default function AdminProfileInfo() {
 
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-gray-700">Description</label>
-
             {editMode ? (
               <textarea
                 name="description"
@@ -223,6 +205,52 @@ export default function AdminProfileInfo() {
                 />
               ) : (
                 <p className="text-gray-700">{form.location}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-pink-50 p-5">
+            <div className="flex flex-col gap-2">
+              <div className="font-semibold text-pink-600">GitHub</div>
+
+              {editMode ? (
+                <input
+                  name="github"
+                  value={form.github}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-pink-500"
+                />
+              ) : (
+                <a
+                  href={form.github}
+                  target="_blank"
+                  className="text-pink-500 hover:text-pink-600 underline"
+                >
+                  {form.github || "Not set"}
+                </a>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-pink-50 p-5">
+            <div className="flex flex-col gap-2">
+              <div className="font-semibold text-pink-600">LinkedIn</div>
+
+              {editMode ? (
+                <input
+                  name="linkedin"
+                  value={form.linkedin}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-pink-500"
+                />
+              ) : (
+                <a
+                  href={form.linkedin}
+                  target="_blank"
+                  className="text-pink-500 hover:text-pink-600 underline"
+                >
+                  {form.linkedin || "Not set"}
+                </a>
               )}
             </div>
           </div>

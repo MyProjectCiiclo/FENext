@@ -3,13 +3,12 @@
 import { Award, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   FaChartPie,
   FaUser,
   FaChartLine,
-  FaCog,
   FaSignOutAlt,
   FaFileAlt,
   FaEnvelope,
@@ -34,7 +33,8 @@ type ActiveSection =
 export default function Sidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { user, getUser } = useUser();
+  const { user, getUser, logout } = useUser();
+  const [openLogoutModal, setOpenLogoutModal] = useState(false);
 
   useEffect(() => {
     getUser();
@@ -174,14 +174,6 @@ export default function Sidebar() {
             <FaChartLine className="text-pink-400" size={20} />
             <span className="text-[#6d4b59]">Analytics</span>
           </Link>
-
-          <Link
-            href="/settings"
-            className={navItemClass(activeSection === "settings")}
-          >
-            <FaCog className="text-pink-400" />
-            <span className="text-[#6d4b59]">Settings</span>
-          </Link>
         </nav>
       </div>
 
@@ -198,10 +190,40 @@ export default function Sidebar() {
           </div>
         </div>
 
-        <button className="w-full text-pink-400 flex items-center justify-center gap-2 border border-[#6d4b59] py-2 rounded-lg hover:bg-[#FDF0F5] transition">
+        <button
+          onClick={() => setOpenLogoutModal(true)}
+          className="w-full text-pink-400 flex items-center justify-center gap-2 border border-[#6d4b59] py-2 rounded-lg hover:bg-[#FDF0F5] transition"
+        >
           <FaSignOutAlt size={20} />
           Logout
         </button>
+        {openLogoutModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[300px]">
+              <h2 className="text-lg font-semibold mb-4 text-center">
+                Are you sure you want to logout?
+              </h2>
+
+              <div className="flex justify-between gap-3">
+                <button
+                  onClick={() => setOpenLogoutModal(false)}
+                  className="w-full py-2 border rounded-lg hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await logout();
+                    setOpenLogoutModal(false);
+                  }}
+                  className="w-full py-2 bg-pink-400 text-white rounded-lg hover:bg-pink-500"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

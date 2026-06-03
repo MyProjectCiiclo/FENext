@@ -1,20 +1,18 @@
 "use client";
-import { useGithub } from "@/hooks/useGithub";
+
+import { useGithub, useProfile } from "@/hooks";
 import Link from "next/link";
-import { useEffect } from "react";
 import { FaRegFolderOpen } from "react-icons/fa";
 import { PiBugBeetleFill } from "react-icons/pi";
 
 export default function IntroSection() {
-  const { githubUser, getGithub } = useGithub();
-  useEffect(() => {
-    getGithub();
-  }, []);
-  console.log("data", githubUser);
+  const { githubUser, loading: githubLoading } = useGithub();
+  const { profile } = useProfile();
+
   return (
     <section
       id="home"
-      className=" bg-[#FDF0F5] text-white px-6 lg:px-[180px] py-16"
+      className=" bg-[#FDF0F5] text-white px-6 lg:px-[180px]"
     >
       <div className="relative grid lg:grid-cols-2 gap-12 items-center">
         <div>
@@ -30,11 +28,8 @@ export default function IntroSection() {
           </h1>
 
           <p className="text-[#6d4b59] mb-8 max-w-xl">
-            {" "}
             Im <span className="font-semibold">Hồ Thị Kim Thanh</span> — a
-            passionate Frontend Developer. I create responsive and user-friendly
-            web applications using Vue.js, TailwindCSS, and modern web
-            technologies.
+            passionate Frontend Developer.
           </p>
 
           <div className="flex gap-4">
@@ -42,28 +37,11 @@ export default function IntroSection() {
               Get In Touch →
             </button>
 
-            <button className="border border-[#6d4b59] hover:border-[#6d4b59] px-6 py-3 rounded-lg transition">
+            <button className="border border-[#6d4b59] px-6 py-3 rounded-lg transition">
               <Link href="/#work" className="text-[#6d4b59] no-underline">
                 View Experience →
               </Link>
             </button>
-          </div>
-
-          <div className="mt-12 space-y-3 text-sm tracking-widest">
-            <div className="flex items-center gap-4 text-pink-400">
-              <span className="w-6 h-[1px] bg-pink-400"></span>
-              <span>ABOUT</span>
-            </div>
-
-            <div className="flex items-center gap-4 text-gray-400">
-              <span className="w-6 h-[1px] bg-gray-600"></span>
-              <span>PROJECTS</span>
-            </div>
-
-            <div className="flex items-center gap-4 text-gray-400">
-              <span className="w-6 h-[1px] bg-gray-600"></span>
-              <span>CONTACT</span>
-            </div>
           </div>
         </div>
 
@@ -73,25 +51,25 @@ export default function IntroSection() {
 
             <div className="relative w-[420px] h-[420px] rounded-full border-[18px] border-pink-300 overflow-hidden shadow-2xl z-10">
               <img
-                src="/assets/image-personal.png"
+                src={profile?.avatar || "/assets/image-personal.png"}
                 alt="avatar"
                 className="w-full h-full object-cover"
               />
             </div>
 
-            <div className="absolute top-10 right-0 translate-x-10 bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg flex items-center gap-3 z-20">
+            <div className="absolute top-10 right-0 translate-x-10 bg-white/80 px-4 py-2 rounded-2xl shadow-lg flex items-center gap-3 z-20">
               <div className="w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center text-white text-sm">
                 <FaRegFolderOpen />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Project</p>
                 <p className="font-bold text-gray-800">
-                  {githubUser?.public_repos ?? 0}
+                  {githubLoading ? "..." : githubUser?.public_repos ?? 0}
                 </p>
               </div>
             </div>
 
-            <div className="absolute bottom-10 left-0 -translate-x-10 bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg flex items-center gap-3 z-20">
+            <div className="absolute bottom-10 left-0 -translate-x-10 bg-white/80 px-4 py-2 rounded-2xl shadow-lg flex items-center gap-3 z-20">
               <div className="w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center text-white text-sm">
                 <PiBugBeetleFill />
               </div>

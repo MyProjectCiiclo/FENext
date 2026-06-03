@@ -1,56 +1,47 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CourseService } from "@/services/course.service";
 import {
-  Course,
+  CreateCourseDTO,
+  UpdateCourseDTO,
 } from "@/types/course.type";
-import { useState } from "react";
+import { toast } from "react-hot-toast";
 
-export function useCourse() {
-  const [courses, setCourses] = useState<Course[]>([]);
+export function useCourseMutation() {
+  const queryClient = useQueryClient();
 
-  const createCourse = async (data: Course) => {
-    try {
-      const res = await CourseService.createCourse(data);
+  const createCourse = useMutation({
+    mutationFn: (data: CreateCourseDTO) =>
+      CourseService.createCourse(data),
 
-      setCourses((prev) => [...prev, res.data]);
+    onSuccess: () => {
+      toast.success("Course created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["education"] });
+    },
+  });
 
-      return res.data;
-    } catch (err) {
-      console.log("CREATE COURSE ERROR:", err);
-      throw err;
-    }
-  };
+  const updateCourse = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateCourseDTO }) =>
+      CourseService.updateCourse(id, data),
 
-  const deleteCourse = async (id: number) => {
-    try {
-      await CourseService.deleteCourse(id);
+    onSuccess: () => {
+      toast.success("Course updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["education"] });
+    },
+  });
 
-      setCourses((prev) => prev.filter((item) => item.id !== id));
-    } catch (err) {
-      console.log("DELETE COURSE ERROR:", err);
-      throw err;
-    }
-  };
+  const deleteCourse = useMutation({
+    mutationFn: (id: number) =>
+      CourseService.deleteCourse(id),
 
-  const updateCourse = async (id: number, data: Course) => {
-    try {
-      const res = await CourseService.updateCourse(id, data);
-
-      setCourses((prev) =>
-        prev.map((item) => (item.id === id ? res.data : item)),
-      );
-
-      return res.data;
-    } catch (err) {
-      console.log("UPDATE COURSE ERROR:", err);
-      throw err;
-    }
-  };
+    onSuccess: () => {
+      toast.success("Course deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["education"] });
+    },
+  });
 
   return {
-    courses,
-    setCourses,
     createCourse,
-    deleteCourse,
     updateCourse,
+    deleteCourse,
   };
 }

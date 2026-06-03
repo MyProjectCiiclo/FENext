@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   GraduationCap,
   Pencil,
@@ -23,34 +23,59 @@ type EducationField =
 type Props = {
   eduItem: Education;
   isEditing: boolean;
+  setEditId: React.Dispatch<React.SetStateAction<number | null>>;
+
+  editData: Partial<Record<EducationField, string>>;
+
   onChange: (id: number, field: EducationField, value: string) => void;
+  onSave: (id: number) => Promise<any> | void;
+
   onDeleteEducation: (id: number) => void;
-  onAddCourse: (id: number) => void;
-  onUpdateCourse?: (eduId: number, courseId: number, name: string) => void;
-  onDeleteCourse: (eduId: number, courseId: number) => void;
-  onSave: (id: number) => void;
-  newCourseValue: string;
+
+  newCourseValue: Record<number, string>;
   setNewCourseValue: React.Dispatch<
     React.SetStateAction<Record<number, string>>
   >;
-  setEditId: React.Dispatch<React.SetStateAction<number | null>>;
+
+  onAddCourse: (id: number) => void;
+  onUpdateCourse: (eduId: number, courseId: number, name: string) => void;
+  onDeleteCourse: (eduId: number, courseId: number) => void;
 };
 
 const EducationCard = React.memo(function EducationCard({
   eduItem,
   isEditing,
+  setEditId,
+  editData,
   onChange,
+  onSave,
   onDeleteEducation,
+  newCourseValue,
+  setNewCourseValue,
   onAddCourse,
   onUpdateCourse,
   onDeleteCourse,
-  onSave,
-  newCourseValue,
-  setNewCourseValue,
-  setEditId,
 }: Props) {
   const [editingCourseId, setEditingCourseId] = useState<number | null>(null);
   const [courseName, setCourseName] = useState("");
+  const [deleteCourseId, setDeleteCourseId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setEditingCourseId(null);
+    setCourseName("");
+  }, [eduItem.id]);
+
+  const getValue = (field: EducationField) => {
+    return editData?.[field] ?? eduItem[field];
+  };
+
+  const handleSave = async () => {
+    await onSave(eduItem.id);
+    setEditId(null);
+  };
+
+  const courses = eduItem.courses ?? [];
+
   return (
     <section className="relative bg-white rounded-[32px] border border-pink-100 shadow-lg">
       <div className="absolute top-10 left-6 w-20 h-20 rounded-[32px] bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center z-10">
@@ -79,10 +104,10 @@ const EducationCard = React.memo(function EducationCard({
         </div>
       </div>
 
-      <div className="px-8 pb-8 pt-12">
+      <div className="px-8 pb-8 pt-1">
         {isEditing ? (
           <input
-            value={eduItem.school}
+            value={getValue("school") || ""}
             onChange={(e) => onChange(eduItem.id, "school", e.target.value)}
             className="mt-6 w-full text-3xl font-bold border-2 border-pink-300 rounded-2xl px-4 py-3"
           />
@@ -92,7 +117,7 @@ const EducationCard = React.memo(function EducationCard({
 
         {isEditing ? (
           <input
-            value={eduItem.major}
+            value={getValue("major") || ""}
             onChange={(e) => onChange(eduItem.id, "major", e.target.value)}
             className="mt-3 w-full text-pink-500 font-semibold border-2 border-pink-300 rounded-2xl px-4 py-3"
           />
@@ -102,7 +127,7 @@ const EducationCard = React.memo(function EducationCard({
 
         {isEditing ? (
           <textarea
-            value={eduItem.description}
+            value={getValue("description") || ""}
             onChange={(e) =>
               onChange(eduItem.id, "description", e.target.value)
             }
@@ -116,7 +141,7 @@ const EducationCard = React.memo(function EducationCard({
           <h3 className="font-semibold mb-4">Courses</h3>
 
           <div className="flex flex-wrap gap-3">
-            {eduItem.courses.map((course) => (
+            {courses.map((course) => (
               <div
                 key={course.id}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50"
@@ -145,7 +170,7 @@ const EducationCard = React.memo(function EducationCard({
                 {editingCourseId === course.id && (
                   <button
                     onClick={() => {
-                      onUpdateCourse?.(eduItem.id, course.id, courseName);
+                      onUpdateCourse(eduItem.id, course.id, courseName);
                       setEditingCourseId(null);
                     }}
                   >
@@ -154,17 +179,18 @@ const EducationCard = React.memo(function EducationCard({
                 )}
 
                 {isEditing && (
-                  <button onClick={() => onDeleteCourse(eduItem.id, course.id)}>
+                  <button onClick={() => setDeleteCourseId(course.id)}>
                     <X size={14} />
                   </button>
                 )}
               </div>
             ))}
           </div>
+
           {isEditing && (
             <div className="flex gap-3 mt-4">
               <input
-                value={newCourseValue || ""}
+                value={newCourseValue[eduItem.id] || ""}
                 onChange={(e) =>
                   setNewCourseValue((prev) => ({
                     ...prev,
@@ -175,10 +201,7 @@ const EducationCard = React.memo(function EducationCard({
               />
 
               <button
-                onClick={() => {
-                  console.log("CLICK BUTTON");
-                  onAddCourse(eduItem.id);
-                }}
+                onClick={() => onAddCourse(eduItem.id)}
                 className="bg-pink-500 text-white px-5 rounded-2xl"
               >
                 <Plus size={18} />
@@ -188,7 +211,7 @@ const EducationCard = React.memo(function EducationCard({
 
           {isEditing && (
             <button
-              onClick={() => onSave(eduItem.id)}
+              onClick={handleSave}
               className="mt-6 w-full bg-gradient-to-r from-pink-500 to-rose-400 text-white py-3 rounded-2xl flex items-center justify-center gap-2"
             >
               <Save size={18} />
@@ -197,6 +220,37 @@ const EducationCard = React.memo(function EducationCard({
           )}
         </div>
       </div>
+
+      {deleteCourseId !== null && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl w-[320px] shadow-xl">
+            <h2 className="text-lg font-semibold mb-4">Delete this course?</h2>
+
+            <p className="text-sm text-gray-500 mb-6">
+              This action cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteCourseId(null)}
+                className="px-4 py-2 rounded-xl bg-gray-200"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  onDeleteCourse(eduItem.id, deleteCourseId);
+                  setDeleteCourseId(null);
+                }}
+                className="px-4 py-2 rounded-xl bg-red-500 text-white"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 });
