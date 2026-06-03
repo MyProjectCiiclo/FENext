@@ -1,0 +1,217 @@
+"use client";
+
+import EducationCard from "./EducationCard";
+import LoadingSpinner from "@/shared/Loading";
+import { useEducation } from "@/hooks/useEducation";
+import { useCourseMutation } from "@/hooks";
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { CreateCourseDTO, Education } from "@/types";
+
+export default function AdminEducation() {
+  const { edu, loading, updateEdu, deleteEdu, createEdu } = useEducation();
+  const { createCourse, updateCourse, deleteCourse } = useCourseMutation();
+
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editData, setEditData] = useState<Record<number, Education>>({});
+
+  const [newCourse, setNewCourse] = useState<Record<number, string>>({});
+
+  const [isCreating, setIsCreating] = useState(false);
+
+  const [newEducation, setNewEducation] = useState({
+    school: "",
+    degree: "",
+    major: "",
+    description: "",
+    start_date: "",
+    end_date: "",
+  });
+
+  if (loading) return <LoadingSpinner />;
+
+  const handleChange = (id: number, field: string, value: string) => {
+    setEditData((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleSave = async (id: number) => {
+    await updateEdu({
+      id,
+      data: editData[id],
+    });
+    setEditId(null);
+  };
+
+  const handleAddEducation = () => {
+    setIsCreating(true);
+  };
+
+  const handleSaveNewEducation = async () => {
+    await createEdu.mutateAsync({
+      school: newEducation.school,
+      degree: newEducation.degree,
+      major: newEducation.major,
+      description: newEducation.description,
+      start_date: newEducation.start_date,
+      end_date: newEducation.end_date,
+    });
+
+    setNewEducation({
+      school: "",
+      degree: "",
+      major: "",
+      description: "",
+      start_date: "",
+      end_date: "",
+    });
+
+    setIsCreating(false);
+  };
+
+  const handleAddCourse = async (eduId: number) => {
+    const name = newCourse[eduId];
+    if (!name?.trim()) return;
+
+    await createCourse.mutateAsync({
+      name,
+      education_id: eduId,
+    });
+
+    setNewCourse((prev) => ({
+      ...prev,
+      [eduId]: "",
+    }));
+  };
+
+  const handleUpdateCourse = async (
+    eduId: number,
+    courseId: number,
+    name: string,
+  ) => {
+    await updateCourse.mutateAsync({
+      id: courseId,
+      data: { name },
+    });
+  };
+
+  const handleDeleteCourse = async (_eduId: number, courseId: number) => {
+    await deleteCourse.mutateAsync(courseId);
+  };
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Education</h2>
+
+        <button
+          onClick={handleAddEducation}
+          className="px-5 py-2 bg-pink-500 text-white rounded-2xl flex items-center gap-2"
+        >
+          <Plus size={16} />
+          Add Education
+        </button>
+      </div>
+
+      {isCreating && (
+        <div className="mb-10 bg-white p-6 rounded-2xl border shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">Create Education</h2>
+
+          <input
+            placeholder="School"
+            value={newEducation.school}
+            onChange={(e) =>
+              setNewEducation((p) => ({ ...p, school: e.target.value }))
+            }
+            className="w-full border p-3 rounded-xl mb-3"
+          />
+
+          <input
+            placeholder="Degree"
+            value={newEducation.degree}
+            onChange={(e) =>
+              setNewEducation((p) => ({ ...p, degree: e.target.value }))
+            }
+            className="w-full border p-3 rounded-xl mb-3"
+          />
+
+          <input
+            placeholder="Major"
+            value={newEducation.major}
+            onChange={(e) =>
+              setNewEducation((p) => ({ ...p, major: e.target.value }))
+            }
+            className="w-full border p-3 rounded-xl mb-3"
+          />
+
+          <textarea
+            placeholder="Description"
+            value={newEducation.description}
+            onChange={(e) =>
+              setNewEducation((p) => ({ ...p, description: e.target.value }))
+            }
+            className="w-full border p-3 rounded-xl mb-3"
+          />
+
+          <input
+            placeholder="Start date"
+            value={newEducation.start_date}
+            onChange={(e) =>
+              setNewEducation((p) => ({ ...p, start_date: e.target.value }))
+            }
+            className="w-full border p-3 rounded-xl mb-3"
+          />
+
+          <input
+            placeholder="End date"
+            value={newEducation.end_date}
+            onChange={(e) =>
+              setNewEducation((p) => ({ ...p, end_date: e.target.value }))
+            }
+            className="w-full border p-3 rounded-xl mb-4"
+          />
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setIsCreating(false)}
+              className="px-4 py-2 bg-gray-300 rounded-xl"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleSaveNewEducation}
+              className="px-4 py-2 bg-pink-500 text-white rounded-xl"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-10">
+        {edu?.map((eduItem) => (
+          <EducationCard
+            key={eduItem.id}
+            eduItem={eduItem}
+            isEditing={editId === eduItem.id}
+            setEditId={setEditId}
+            editData={editData[eduItem.id] || {}}
+            onChange={handleChange}
+            onSave={handleSave}
+            onDeleteEducation={deleteEdu}
+            newCourseValue={newCourse}
+            setNewCourseValue={setNewCourse}
+            onAddCourse={handleAddCourse}
+            onUpdateCourse={handleUpdateCourse}
+            onDeleteCourse={handleDeleteCourse}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}

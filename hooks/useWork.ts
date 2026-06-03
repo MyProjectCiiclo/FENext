@@ -1,24 +1,23 @@
-import { workService } from "@/services/work.service";
-import { WorkExperience } from "@/types/work";
-import { useState } from "react";
-import toast from "react-hot-toast";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { workService } from "@/services";
 
 export function useWork() {
-  const [loading, setLoading] = useState(false);
-  const [work, setWork] = useState<WorkExperience[]>([]);
-
-  const getWork = async () => {
-    setLoading(true);
-
-    try {
+  const query = useQuery({
+    queryKey: ["work"],
+    queryFn: async () => {
       const res = await workService.getWork();
-      setWork(res || []);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return res || [];
+    },
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
 
-  return { work, getWork, loading };
+  return {
+    work: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error,
+    getWork: query.refetch,
+  };
 }

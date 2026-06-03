@@ -1,11 +1,9 @@
-
-import { WorkExperience } from "@/types/work";
-import api from "./api";
+import { WorkYearGroup } from "@/types/work.type";
+import api from "../lib/api";
 
 export const workService = {
-  async getWork(): Promise<WorkExperience[]> {
+  async getWork(): Promise<WorkYearGroup[]> {
     const res = await api.get("/work-experiences");
-
-    return res.data?.data || res.data?.work || res.data || [];
+    return res.data?.data ?? [];
   },
 };

@@ -1,8 +1,31 @@
-import api from "./api";
-import { ContactForm } from "@/types/contact";
+import { Contact } from "@/types";
+import api from "../lib/api";
 
 export const contactService = {
-  sendContact(payload: ContactForm) {
-    return api.post("/contact", payload);
+  async sendContact(payload: Contact) {
+    try {
+      const response = await api.post("/contact", payload);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getContact() {
+    try {
+      const response = await api.get("/contact/list");
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteContact(id: number) {
+    try {
+      const response = await api.delete(`/contact/destroy/${id}`);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   },
 };
