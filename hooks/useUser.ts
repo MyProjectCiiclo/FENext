@@ -45,6 +45,7 @@ export function useUser() {
       localStorage.removeItem("token");
       queryClient.setQueryData(["user"], null);
       queryClient.invalidateQueries({ queryKey: ["user"] });
+      toast.success("Logged out successfully");
       router.push("/login");
     },
   });
