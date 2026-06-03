@@ -1,14 +1,17 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 
 import AdminLayout from "../AdminLayout";
 import { Dashboard } from "./components";
 import LoadingSpinner from "@/shared/Loading";
+import toast from "react-hot-toast";
 
-const AnalyticsCharts = dynamic(
+const AnalyticsCharts = dynamicImport(
   () =>
     import("./components").then(
       (module) => module.AnalyticsCharts
@@ -18,7 +21,7 @@ const AnalyticsCharts = dynamic(
   }
 );
 
-const OverviewChart = dynamic(
+const OverviewChart = dynamicImport(
   () =>
     import("./components").then(
       (module) => module.OverviewChart
@@ -35,8 +38,8 @@ export default function Page() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("Vui lòng login");
-      router.push("/login");
+      toast.error("Please login to access the dashboard");
+      router.replace("/login");
     }
   }, [router]);
 
