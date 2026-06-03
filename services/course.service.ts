@@ -1,16 +1,19 @@
 import api from "@/lib/api";
-import { Course } from "@/types";
+import { Course, CreateCourseDTO, UpdateCourseDTO } from "@/types";
 
 export const CourseService = {
-  createCourse: (data: Course) => {
-    return api.post("/courses/create-courses", data);
+  createCourse: async (data: CreateCourseDTO) => {
+    const res = await api.post("/courses/create-courses", data);
+    return res.data;
   },
 
-  deleteCourse: (id: number) => {
-    return api.delete(`/courses/destroy/${id}`);
+  deleteCourse: async (id: number) => {
+    const res = await api.delete(`/courses/destroy/${id}`);
+    return res.data;
   },
 
-  updateCourse: (id: number, data: Course) => {
-    return api.put(`/courses/update-courses/${id}`, data);
+  updateCourse: async (id: number, data: UpdateCourseDTO) => {
+    const res = await api.put(`/courses/update-courses/${id}`, data);
+    return res.data;
   },
 };

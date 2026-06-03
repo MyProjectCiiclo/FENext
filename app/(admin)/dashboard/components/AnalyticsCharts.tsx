@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -17,40 +17,34 @@ import { Skill } from "@/types";
 import LoadingSpinner from "@/shared/Loading";
 
 export default function AnalyticsCharts() {
-  const { skills, fetchSkills } = useSkill();
-  const { work, getWork } = useWork();
+  const { skills } = useSkill();
+  const { work } = useWork();
 
   const [hovered, setHovered] = useState<null | {
     name: string;
     percent: number;
   }>(null);
 
-  useEffect(() => {
-    fetchSkills();
-    getWork();
-  }, [fetchSkills, getWork]);
-
   const safeSkills: Skill[] = Array.isArray(skills) ? skills : [];
 
   const mergedSkills = Object.values(
-    safeSkills.reduce((acc, skill) => {
-      const key = skill.name.toLowerCase().trim();
+    safeSkills.reduce(
+      (acc, skill) => {
+        const key = skill.name.toLowerCase().trim();
 
-      if (!acc[key]) {
-        acc[key] = { ...skill };
-      } else {
-        acc[key].weight =
-          (acc[key].weight || 1) + (skill.weight || 1);
-      }
+        if (!acc[key]) {
+          acc[key] = { ...skill };
+        } else {
+          acc[key].weight = (acc[key].weight || 1) + (skill.weight || 1);
+        }
 
-      return acc;
-    }, {} as Record<string, Skill>)
+        return acc;
+      },
+      {} as Record<string, Skill>,
+    ),
   );
 
-  const totalWeight = mergedSkills.reduce(
-    (sum, s) => sum + (s.weight || 1),
-    0
-  );
+  const totalWeight = mergedSkills.reduce((sum, s) => sum + (s.weight || 1), 0);
 
   const normalizedSkills = mergedSkills.map((s) => ({
     ...s,
@@ -77,9 +71,6 @@ export default function AnalyticsCharts() {
       }))
     : [];
 
-  if (!workData.length || !normalizedSkills.length) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <section id="analytics-charts">
@@ -144,9 +135,7 @@ export default function AnalyticsCharts() {
 
         <div className="border border-pink-100 rounded-xl p-4 flex-1 flex flex-col">
           <div>
-            <h3 className="text-pink-400 font-bold text-xl">
-              WORK EXPERIENCE
-            </h3>
+            <h3 className="text-pink-400 font-bold text-xl">WORK EXPERIENCE</h3>
             <p className="text-gray-400 italic text-sm">
               Total projects by year
             </p>

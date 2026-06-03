@@ -1,17 +1,20 @@
 import api from "@/lib/api";
 
 export const profileService = {
-  getProfile: async () => {
-    return await api.get("/profile");
+  async getProfile() {
+    const res = await api.get("/profile");
+    return res.data;
   },
 
-  updateProfile: async (data: FormData) => {
+  async updateProfile(data: FormData) {
     data.append("_method", "PUT");
 
-    return await api.post("/profile/update", data, {
+    const res = await api.post("/profile/update", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
+
+    return res.data;
   },
 };

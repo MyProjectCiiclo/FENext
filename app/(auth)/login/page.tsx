@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
-  const { infoUser } = useUser();
+  const { infoUser, loading } = useUser();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -14,19 +14,22 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    const success = await infoUser({
-      email,
-      password,
-    });
+    if (!email || !password) return;
+
+    const success = await infoUser({ email, password });
 
     if (success) {
       setEmail("");
       setPassword("");
       router.push("/dashboard");
     }
-    
   };
-  
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-pink-50">
@@ -42,11 +45,10 @@ export default function Login() {
 
         <div className="mb-4 w-full">
           <input
-            className="w-full p-3 rounded-xl bg-gray-50 text-gray-800 
-            border border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100 
-            outline-none transition"
+            className="w-full p-3 rounded-xl bg-gray-50 text-gray-800 border border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100 outline-none transition"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
             type="email"
             placeholder="Enter email"
           />
@@ -54,11 +56,10 @@ export default function Login() {
 
         <div className="mb-4 w-full relative">
           <input
-            className="w-full p-3 pr-10 rounded-xl bg-gray-50 text-gray-800 
-            border border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100 
-            outline-none transition"
+            className="w-full p-3 pr-10 rounded-xl bg-gray-50 text-gray-800 border border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100 outline-none transition"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
             type={showPassword ? "text" : "password"}
             placeholder="Enter password"
           />
@@ -78,10 +79,12 @@ export default function Login() {
 
         <button
           onClick={handleLogin}
+          disabled={loading}
           className="w-full py-3 rounded-xl bg-[#FF4D8D] text-white font-medium
-          hover:bg-[#ff2f7a] transition-all duration-300 shadow-md hover:shadow-lg"
+          hover:bg-[#ff2f7a] transition-all duration-300 shadow-md hover:shadow-lg
+          disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sign in
+          {loading ? "Signing in..." : "Sign in"}
         </button>
       </div>
     </div>

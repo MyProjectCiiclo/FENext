@@ -1,53 +1,36 @@
-import { useState } from "react";
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ratingService } from "@/services";
+import { Rating } from "@/types";
 import toast from "react-hot-toast";
 
-import { Rating } from "@/types";
-import { ratingService } from "@/services";
-
 export function useRating() {
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const [ratings, setRatings] = useState<Rating[]>([]);
+  const query = useQuery({
+    queryKey: ["ratings"],
+    queryFn: ratingService.getRating,
+    staleTime: 1000 * 60 * 5,
+  });
 
-  const getRating = async () => {
-    setLoading(true);
-
-    try {
-      const data = await ratingService.getRating();
-
-      setRatings(data ?? []);
-    } catch (err) {
-      console.log(err);
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteRating = async (id: number) => {
-    setLoading(true);
-
-    try {
-      await ratingService.deleteRating(id);
-
-      setRatings((prev) =>
-        prev.filter((rating) => rating.id !== id)
-      );
-
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => ratingService.deleteRating(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ratings"] });
       toast.success("Delete success!");
-    } catch (err) {
-      console.log(err);
+    },
+    onError: () => {
       toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
   return {
-    getRating,
-    deleteRating,
+    ratings: (query.data as Rating[]) ?? [],
+    loading: query.isLoading,
+    error: query.error,
 
-    loading,
-    ratings,
+    getRating: query.refetch,
+    deleteRating: deleteMutation.mutateAsync,
   };
 }

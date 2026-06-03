@@ -3,7 +3,7 @@ import { FaEnvelope, FaGithub, FaLinkedin } from "react-icons/fa";
 export default function Footer() {
   return (
     <footer className="bg-[#FDF0F5] border-t border-pink-100 py-[60px] pb-[25px]">
-      <div className="mx-auto  lg:px-[180px]">
+      <div className="mx-auto lg:px-[180px]">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] gap-[40px] pb-[35px] border-b border-pink-100">
           <div>
             <h3 className="text-[#6d4b59] text-[20px] mb-[18px] font-bold">
@@ -11,13 +11,14 @@ export default function Footer() {
             </h3>
 
             <p className="text-[15px] leading-7 text-[#7b5a68]">
-              Tạo những sản phẩm chất lượng và giải quyết vấn đề bằng công nghệ.
+              Creating high-quality products and solving problems through
+              technology.
             </p>
           </div>
 
           <div>
             <h3 className="text-[#6d4b59] text-[20px] mb-[18px] font-bold">
-              Điều hướng
+              Navigation
             </h3>
 
             <ul className="space-y-[12px]">
@@ -26,7 +27,7 @@ export default function Footer() {
                   href="#"
                   className="text-[#7b5a68] hover:text-pink-400 duration-300"
                 >
-                  Trang chủ
+                  Home
                 </a>
               </li>
 
@@ -35,7 +36,7 @@ export default function Footer() {
                   href="#"
                   className="text-[#7b5a68] hover:text-pink-400 duration-300"
                 >
-                  Dự án
+                  Projects
                 </a>
               </li>
 
@@ -44,7 +45,7 @@ export default function Footer() {
                   href="#"
                   className="text-[#7b5a68] hover:text-pink-400 duration-300"
                 >
-                  Về tôi
+                  About Me
                 </a>
               </li>
 
@@ -53,7 +54,7 @@ export default function Footer() {
                   href="#"
                   className="text-[#7b5a68] hover:text-pink-400 duration-300"
                 >
-                  Liên hệ
+                  Contact
                 </a>
               </li>
             </ul>
@@ -61,7 +62,7 @@ export default function Footer() {
 
           <div>
             <h3 className="text-[#6d4b59] text-[20px] mb-[18px] font-bold">
-              Tài nguyên
+              Resources
             </h3>
 
             <ul className="space-y-[12px]">
@@ -79,7 +80,7 @@ export default function Footer() {
                   href="#"
                   className="text-[#7b5a68] hover:text-pink-400 duration-300"
                 >
-                  Hướng dẫn
+                  Tutorials
                 </a>
               </li>
 
@@ -88,7 +89,7 @@ export default function Footer() {
                   href="#"
                   className="text-[#7b5a68] hover:text-pink-400 duration-300"
                 >
-                  Tài liệu
+                  Documentation
                 </a>
               </li>
             </ul>
@@ -96,7 +97,7 @@ export default function Footer() {
 
           <div>
             <h3 className="text-[#6d4b59] text-[20px] mb-[18px] font-bold">
-              Kết nối
+              Connect
             </h3>
 
             <div className="flex flex-wrap gap-[12px]">
@@ -134,14 +135,14 @@ export default function Footer() {
               href="#"
               className="text-[#9a7b87] hover:text-pink-400 duration-300"
             >
-              Privacy
+              Privacy Policy
             </a>
 
             <a
               href="#"
               className="text-[#9a7b87] hover:text-pink-400 duration-300"
             >
-              Terms
+              Terms of Service
             </a>
           </div>
         </div>

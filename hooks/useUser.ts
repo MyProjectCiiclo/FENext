@@ -1,58 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userService } from "@/services";
 import { User } from "@/types";
-
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 export function useUser() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const userQuery = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const res = await userService.getUser();
+      return res.data?.user as User;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
 
-  const getUser = async () => {
-    setLoading(true);
+  const loginMutation = useMutation({
+    mutationFn: async (data: { email: string; password: string }) => {
+      const res = await userService.sendUserLogin(data);
+      toast.success("Logged in successfully");
+      return res.data;
+    },
 
-    try {
-      const response = await userService.getUser();
-
-      const userData = response.data?.user;
-
-      setUser(userData);
-
-      return userData;
-    } catch (error) {
-      console.log("GET USER ERROR:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const infoUser = async (data: { email: string; password: string }) => {
-    setLoading(true);
-
-    try {
-      const response = await userService.sendUserLogin(data);
-
-      console.log(response.data);
-
-      const token = response.data?.access_token;
+    onSuccess: (data) => {
+      const token = data?.access_token;
 
       if (token) {
         localStorage.setItem("token", token);
       }
 
-      return true;
-    } catch (error) {
-      console.log("LOGIN ERROR:", error);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const res = await userService.logout();
+      return res.data;
+    },
+
+    onSuccess: () => {
+      localStorage.removeItem("token");
+      queryClient.setQueryData(["user"], null);
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      router.push("/login");
+    },
+  });
 
   return {
-    user,
-    loading,
-    getUser,
-    infoUser,
+    user: userQuery.data,
+    loading: userQuery.isLoading,
+    error: userQuery.error,
+
+    getUser: userQuery.refetch,
+    infoUser: loginMutation.mutateAsync,
+    logout: logoutMutation.mutateAsync,
   };
 }

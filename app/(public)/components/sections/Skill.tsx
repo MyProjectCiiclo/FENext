@@ -1,19 +1,16 @@
 "use client";
 
 import { useSkill } from "@/hooks/useSkill";
-import { useEffect } from "react";
 
 export default function Skill() {
-  const { fetchSkills, skills = [] } = useSkill();
+  const { skills } = useSkill();
 
-  useEffect(() => {
-    fetchSkills();
-  }, []);
+  const safeSkills = Array.isArray(skills) ? skills : [];
 
   return (
     <section
       id="skills"
-      className="bg-[#FDF0F5] py-20 overflow-hidden px-6 lg:px-[180px]"
+      className="bg-[#FDF0F5] py-10 overflow-hidden px-6 lg:px-[180px]"
     >
       <div className="relative w-fit mx-auto mb-[70px]">
         <div className="relative inline-block bg-[#f8d9e5] text-pink-400 px-8 py-3 rounded-xl text-lg font-semibold">
@@ -25,13 +22,13 @@ export default function Skill() {
 
       <div className="overflow-hidden">
         <div className="flex w-max animate-[scrollLeft_12s_linear_infinite] gap-[50px]">
-          {[...skills, ...skills].map((skill, index) => (
+          {[...safeSkills, ...safeSkills].map((skill, index) => (
             <div
-              key={index}
+              key={`${skill.id ?? skill.name}-${index}`}
               className="w-[200px] h-[180px] bg-white rounded-[12px] flex flex-col justify-center items-center shrink-0"
             >
               <img
-                src={skill.icon}
+                src={skill.image}
                 alt={skill.name}
                 className="w-[50px] h-[50px] object-contain mb-4"
               />
@@ -39,7 +36,6 @@ export default function Skill() {
               <h3 className="text-black text-[16px] font-medium">
                 {skill.name}
               </h3>
-
             </div>
           ))}
         </div>

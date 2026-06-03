@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -12,50 +12,47 @@ import {
 } from "recharts";
 
 import { useGithub } from "@/hooks/useGithub";
+import { ContributionWeek } from "@/types";
 
 export default function OverviewChart() {
-  const { contributions, getGithub } = useGithub();
-
-  useEffect(() => {
-    getGithub();
-  }, []);
+  const { contributions } = useGithub();
 
   const chartData = useMemo(() => {
     if (!contributions?.weeks) return [];
 
-    return contributions.weeks.flatMap((week) =>
+    return contributions.weeks.flatMap((week: ContributionWeek) =>
       week.contributionDays.map((day) => ({
         date: day.date,
         contributions: day.contributionCount,
-      }))
+      })),
     );
   }, [contributions]);
 
   return (
-    <div className="p-4 border border-pink-100 rounded-xl mt-5">
-      <div>
-        <h3 className="text-sm font-semibold text-gray-900">
+    <div className="p-6 border border-pink-100 rounded-2xl bg-white/60 backdrop-blur-md">
+      <div className="mb-4">
+        <h3 className="text-sm font-semibold text-[#6d4b59]">
           Activity Overview
         </h3>
 
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-[#7b5a68] mt-1">
           GitHub contributions activity
         </p>
       </div>
 
-      <div className="h-[300px] w-full mt-4">
+      <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
-              stroke="#E5E7EB"
+              stroke="#f3d4e2"
             />
 
             <XAxis
               dataKey="date"
               tick={{ fontSize: 11 }}
-              tickFormatter={(value) => value.slice(5)} // chỉ lấy MM-DD
+              tickFormatter={(value: string) => value.slice(5)}
             />
 
             <YAxis />
@@ -65,7 +62,7 @@ export default function OverviewChart() {
             <Line
               type="monotone"
               dataKey="contributions"
-              stroke="#2563EB"
+              stroke="#ec4899"
               strokeWidth={2}
               dot={false}
             />

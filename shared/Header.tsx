@@ -1,73 +1,55 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useProfile } from "@/hooks";
 
 export default function Header() {
+  const { profile, loading } = useProfile();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#f3d8e4] bg-[#FDF0F5]/90 backdrop-blur-xl">
-      <div className=" mx-auto flex items-center justify-between px-4 lg:px-[180px] py-2">
+      <div className="mx-auto flex items-center justify-between px-4 lg:px-[180px] py-2">
         <div className="flex items-center gap-4 cursor-pointer group">
-          <div className="relative">
+          <div className="relative w-[50px] h-[50px] rounded-full overflow-hidden">
             <Image
-              src="/assets/image-personal.png"
+              src={profile?.avatar || "/assets/image-personal.png"}
               alt="Avatar"
-              width={50}
-              height={50}
-              className="rounded-full object-cover border-2 border-pink-300 shadow-[0_0_20px_rgba(244,114,182,0.35)] group-hover:scale-105 transition duration-300"
+              fill
+              className="object-cover border-2 border-pink-300 shadow-[0_0_20px_rgba(244,114,182,0.35)] group-hover:scale-105 transition duration-300"
             />
-
             <div className="absolute inset-0 rounded-full border-2 border-pink-200 animate-ping opacity-20"></div>
           </div>
 
           <div>
             <h1 className="text-[#4b2e39] text-[18px] font-bold tracking-wide">
-              Kim Thanh
+              {loading ? "Loading..." : profile?.full_name}
             </h1>
-
-            <p className="text-[#9b7283] text-[16px]">Software Engineer</p>
+            <p className="text-[#9b7283] text-[16px]">
+              {loading ? "Loading..." : profile?.title}
+            </p>
           </div>
         </div>
 
         <nav className="hidden md:block">
           <ul className="flex items-center gap-10 text-[16px] font-medium text-[#6d4b59]">
             <li>
-              <Link
-                href="/#intro"
-                className="relative hover:text-pink-500 transition duration-300 after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-0 after:bg-pink-400 after:transition-all after:duration-300 hover:after:w-full"
-              >
-                Home
-              </Link>
+              <Link href="/#intro">Home</Link>
             </li>
             <li>
-              <Link
-                href="/#about"
-                className="relative hover:text-pink-500 transition duration-300 after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-0 after:bg-pink-400 after:transition-all after:duration-300 hover:after:w-full"
-              >
-                About
-              </Link>
+              <Link href="/#about">About</Link>
             </li>
-
             <li>
-              <Link
-                href="/#skills"
-                className="relative hover:text-pink-500 transition duration-300 after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-0 after:bg-pink-400 after:transition-all after:duration-300 hover:after:w-full"
-              >
-                Skills
-              </Link>
+              <Link href="/#skills">Skills</Link>
             </li>
-
             <li>
-              <Link
-                href="/#contact"
-                className="relative hover:text-pink-500 transition duration-300 after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-0 after:bg-pink-400 after:transition-all after:duration-300 hover:after:w-full"
-              >
-                Contact
-              </Link>
+              <Link href="/#contact">Contact</Link>
             </li>
           </ul>
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <button className="px-5 py-2 rounded-full bg-pink-400 text-white font-semibold hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(244,114,182,0.35)]">
+          <button className="px-5 py-2 rounded-full bg-pink-400 text-white font-semibold hover:scale-105 transition duration-300">
             Hire Me
           </button>
         </div>

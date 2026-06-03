@@ -1,39 +1,35 @@
+"use client";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { profileService } from "@/services/profile.service";
-import { Profile } from "@/types";
-import { useCallback, useState } from "react";
 
 export function useProfile() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const getProfile = useCallback(async () => {
-    try {
-      setLoading(true);
+  const query = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
       const res = await profileService.getProfile();
-      setProfile(res.data.data);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
-  const updateProfile = async (data: FormData) => {
-    try {
-      setLoading(true);
+      return res?.data?.data ?? res?.data ?? null;
+    },
+  });
 
-      const res = await profileService.updateProfile(data);
+  const updateProfile = useMutation({
+    mutationFn: profileService.updateProfile,
 
-      setProfile(res.data.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    onSuccess: (res) => {
+      const updated = res?.data?.data ?? res?.data ?? null;
+
+      queryClient.setQueryData(["profile"], updated);
+    },
+  });
 
   return {
-    profile,
-    loading,
-    getProfile,
-    updateProfile,
+    profile: query.data ?? null,
+    loading: query.isLoading,
+
+    updateProfile: updateProfile.mutateAsync, // 🔥 nên dùng mutateAsync
+    isUpdating: updateProfile.isPending,
   };
 }

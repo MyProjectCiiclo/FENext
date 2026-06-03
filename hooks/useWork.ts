@@ -1,24 +1,23 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { workService } from "@/services";
-import { WorkYearGroup } from "@/types";
-import { useState } from "react";
 
 export function useWork() {
-  const [loading, setLoading] = useState(false);
-  const [work, setWork] = useState<WorkYearGroup[]>([]);
-
-  const getWork = async () => {
-    setLoading(true);
-
-    try {
+  const query = useQuery({
+    queryKey: ["work"],
+    queryFn: async () => {
       const res = await workService.getWork();
-      setWork(res || []);
-    } catch (err) {
-      console.log(err);
-      setWork([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return res || [];
+    },
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
 
-  return { work, getWork, loading };
+  return {
+    work: query.data ?? [],
+    loading: query.isLoading,
+    error: query.error,
+    getWork: query.refetch,
+  };
 }

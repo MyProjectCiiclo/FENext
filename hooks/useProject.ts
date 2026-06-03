@@ -1,93 +1,51 @@
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { projectService } from "@/services";
 import { Project } from "@/types";
-import { useState, useCallback } from "react";
 
-export default function useProject() {
-  const [loading, setLoading] = useState(false);
+export default function useProject(page: number = 1) {
+  const queryClient = useQueryClient();
 
-  const [projects, setProjects] = useState<Project[]>([]);
+  const projectQuery = useQuery({
+    queryKey: ["projects", page],
+    queryFn: () => projectService.getProjects(page),
+    staleTime: 1000 * 60 * 5,
+  });
 
-  const [page, setPage] = useState(1);
+  const createMutation = useMutation({
+    mutationFn: projectService.sendProject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
 
-  const [meta, setMeta] = useState<{
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  } | null>(null);
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: FormData }) =>
+      projectService.updateProject(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
 
-  const getProjects = useCallback(async (pageNumber = 1) => {
-    setLoading(true);
-
-    try {
-      const res = await projectService.getProjects(pageNumber);
-
-      setProjects(res.data);
-
-      setMeta(res.meta);
-
-      setPage(pageNumber);
-
-      console.log("PROJECT RESPONSE:", res);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const createProject = async (data: FormData) => {
-    setLoading(true);
-
-    try {
-      await projectService.sendProject(data);
-
-      await getProjects(page);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateProject = async (id: number, data: FormData) => {
-    setLoading(true);
-
-    try {
-      await projectService.updateProject(id, data);
-
-      await getProjects(page);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteProject = async (id: number) => {
-    setLoading(true);
-
-    try {
-      await projectService.deleteProject(id);
-
-      await getProjects(page);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => projectService.deleteProject(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
 
   return {
-    projects,
-    loading,
-    page,
-    setPage,
-    meta,
+    projects: (projectQuery.data?.data as Project[]) ?? [],
+    meta: projectQuery.data?.meta ?? null,
 
-    getProjects,
-    createProject,
-    updateProject,
-    deleteProject,
+    loading: projectQuery.isLoading,
+    error: projectQuery.error,
+
+    refetch: projectQuery.refetch,
+
+    createProject: createMutation.mutateAsync,
+    updateProject: updateMutation.mutateAsync,
+    deleteProject: deleteMutation.mutateAsync,
   };
 }

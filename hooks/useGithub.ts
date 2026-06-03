@@ -1,39 +1,34 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { githubService } from "@/services";
-import { GithubUser, GithubContribution } from "@/types";
-import { useState } from "react";
-import toast from "react-hot-toast";
+import type { GithubContribution, GithubUser } from "@/types";
 
 export function useGithub() {
-  const [loading, setLoading] = useState(false);
-
-  const [githubUser, setGithubUser] = useState<GithubUser | null>(null);
-  const [contributions, setContributions] = useState<GithubContribution | null>(
-    null,
-  );
-
-  const getGithub = async () => {
-    setLoading(true);
-
-    try {
+  const query = useQuery({
+    queryKey: ["github"],
+    queryFn: async (): Promise<{
+      githubUser: GithubUser;
+      contributions: GithubContribution;
+    }> => {
       const [userRes, contributionRes] = await Promise.all([
         githubService.getGithubUser(),
         githubService.getContributions(),
       ]);
 
-      setGithubUser(userRes.data);
-      setContributions(contributionRes.data);
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+      return {
+        githubUser: userRes.data,
+        contributions: contributionRes.data,
+      };
+    },
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
 
   return {
-    loading,
-    githubUser,
-    contributions,
-    getGithub,
+    githubUser: query.data?.githubUser ?? null,
+    contributions: query.data?.contributions ?? null,
+    loading: query.isLoading,
+    error: query.error,
   };
 }

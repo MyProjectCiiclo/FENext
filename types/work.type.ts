@@ -1,4 +1,4 @@
-export interface WorkExperience {
+export interface WorkExperiences {
    id: number;
   title: string;
   company: string;
@@ -12,5 +12,5 @@ export interface WorkExperience {
 export interface WorkYearGroup {
   year: number;
   total: number;
-  work_experiences: WorkExperience[];
+  work_experiences: WorkExperiences[];
 }
