@@ -6,14 +6,25 @@ import { useEducation } from "@/hooks/useEducation";
 import { useCourseMutation } from "@/hooks";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { CreateCourseDTO, Education } from "@/types";
+import { Education } from "@/types";
+
+type EducationField =
+  | "school"
+  | "degree"
+  | "major"
+  | "start_date"
+  | "end_date"
+  | "description";
 
 export default function AdminEducation() {
   const { edu, loading, updateEdu, deleteEdu, createEdu } = useEducation();
   const { createCourse, updateCourse, deleteCourse } = useCourseMutation();
 
   const [editId, setEditId] = useState<number | null>(null);
-  const [editData, setEditData] = useState<Record<number, Education>>({});
+
+  const [editData, setEditData] = useState<
+    Record<number, Partial<Record<EducationField, string>>>
+  >({});
 
   const [newCourse, setNewCourse] = useState<Record<number, string>>({});
 
@@ -30,7 +41,7 @@ export default function AdminEducation() {
 
   if (loading) return <LoadingSpinner />;
 
-  const handleChange = (id: number, field: string, value: string) => {
+  const handleChange = (id: number, field: EducationField, value: string) => {
     setEditData((prev) => ({
       ...prev,
       [id]: {
@@ -41,26 +52,30 @@ export default function AdminEducation() {
   };
 
   const handleSave = async (id: number) => {
+    const data = editData[id];
+    if (!data) return;
+
+    const current = edu?.find((e) => e.id === id);
+
+    if (!current) return;
+
     await updateEdu({
       id,
-      data: editData[id],
+      data: {
+        school: data.school ?? current.school,
+        degree: data.degree ?? current.degree,
+        major: data.major ?? current.major,
+        description: data.description ?? current.description,
+        start_date: data.start_date ?? current.start_date,
+        end_date: data.end_date ?? current.end_date,
+      },
     });
+
     setEditId(null);
   };
 
-  const handleAddEducation = () => {
-    setIsCreating(true);
-  };
-
   const handleSaveNewEducation = async () => {
-    await createEdu.mutateAsync({
-      school: newEducation.school,
-      degree: newEducation.degree,
-      major: newEducation.major,
-      description: newEducation.description,
-      start_date: newEducation.start_date,
-      end_date: newEducation.end_date,
-    });
+    await createEdu.mutateAsync(newEducation as any);
 
     setNewEducation({
       school: "",
@@ -76,6 +91,7 @@ export default function AdminEducation() {
 
   const handleAddCourse = async (eduId: number) => {
     const name = newCourse[eduId];
+
     if (!name?.trim()) return;
 
     await createCourse.mutateAsync({
@@ -90,26 +106,27 @@ export default function AdminEducation() {
   };
 
   const handleUpdateCourse = async (
-    eduId: number,
+    _eduId: number,
     courseId: number,
     name: string,
   ) => {
     await updateCourse.mutateAsync({
       id: courseId,
-      data: { name },
+      data: { name } as any,
     });
   };
 
   const handleDeleteCourse = async (_eduId: number, courseId: number) => {
     await deleteCourse.mutateAsync(courseId);
   };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Education</h2>
 
         <button
-          onClick={handleAddEducation}
+          onClick={() => setIsCreating(true)}
           className="px-5 py-2 bg-pink-500 text-white rounded-2xl flex items-center gap-2"
         >
           <Plus size={16} />
@@ -125,7 +142,10 @@ export default function AdminEducation() {
             placeholder="School"
             value={newEducation.school}
             onChange={(e) =>
-              setNewEducation((p) => ({ ...p, school: e.target.value }))
+              setNewEducation((p) => ({
+                ...p,
+                school: e.target.value,
+              }))
             }
             className="w-full border p-3 rounded-xl mb-3"
           />
@@ -134,7 +154,10 @@ export default function AdminEducation() {
             placeholder="Degree"
             value={newEducation.degree}
             onChange={(e) =>
-              setNewEducation((p) => ({ ...p, degree: e.target.value }))
+              setNewEducation((p) => ({
+                ...p,
+                degree: e.target.value,
+              }))
             }
             className="w-full border p-3 rounded-xl mb-3"
           />
@@ -143,7 +166,10 @@ export default function AdminEducation() {
             placeholder="Major"
             value={newEducation.major}
             onChange={(e) =>
-              setNewEducation((p) => ({ ...p, major: e.target.value }))
+              setNewEducation((p) => ({
+                ...p,
+                major: e.target.value,
+              }))
             }
             className="w-full border p-3 rounded-xl mb-3"
           />
@@ -152,25 +178,34 @@ export default function AdminEducation() {
             placeholder="Description"
             value={newEducation.description}
             onChange={(e) =>
-              setNewEducation((p) => ({ ...p, description: e.target.value }))
+              setNewEducation((p) => ({
+                ...p,
+                description: e.target.value,
+              }))
             }
             className="w-full border p-3 rounded-xl mb-3"
           />
 
           <input
-            placeholder="Start date"
+            type="date"
             value={newEducation.start_date}
             onChange={(e) =>
-              setNewEducation((p) => ({ ...p, start_date: e.target.value }))
+              setNewEducation((p) => ({
+                ...p,
+                start_date: e.target.value,
+              }))
             }
             className="w-full border p-3 rounded-xl mb-3"
           />
 
           <input
-            placeholder="End date"
+            type="date"
             value={newEducation.end_date}
             onChange={(e) =>
-              setNewEducation((p) => ({ ...p, end_date: e.target.value }))
+              setNewEducation((p) => ({
+                ...p,
+                end_date: e.target.value,
+              }))
             }
             className="w-full border p-3 rounded-xl mb-4"
           />
