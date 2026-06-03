@@ -59,7 +59,7 @@ const EducationCard = React.memo(function EducationCard({
   const [editingCourseId, setEditingCourseId] = useState<number | null>(null);
   const [courseName, setCourseName] = useState("");
   const [deleteCourseId, setDeleteCourseId] = useState<number | null>(null);
-
+  const [deleteEduConfirm, setDeleteEduConfirm] = useState(false);
   useEffect(() => {
     setEditingCourseId(null);
     setCourseName("");
@@ -94,7 +94,7 @@ const EducationCard = React.memo(function EducationCard({
 
           {isEditing && (
             <button
-              onClick={() => onDeleteEducation(eduItem.id)}
+              onClick={() => setDeleteEduConfirm(true)}
               className="px-4 py-2 rounded-2xl bg-red-500/70 text-white flex items-center gap-2"
             >
               <Trash2 size={16} />
@@ -242,6 +242,39 @@ const EducationCard = React.memo(function EducationCard({
                 onClick={() => {
                   onDeleteCourse(eduItem.id, deleteCourseId);
                   setDeleteCourseId(null);
+                }}
+                className="px-4 py-2 rounded-xl bg-red-500 text-white"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deleteEduConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl w-[340px] shadow-xl">
+            <h2 className="text-lg font-semibold mb-2">
+              Delete this education?
+            </h2>
+
+            <p className="text-sm text-gray-500 mb-6">
+              All courses inside will also be removed. This action cannot be
+              undone.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteEduConfirm(false)}
+                className="px-4 py-2 rounded-xl bg-gray-200"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  onDeleteEducation(eduItem.id);
+                  setDeleteEduConfirm(false);
                 }}
                 className="px-4 py-2 rounded-xl bg-red-500 text-white"
               >
