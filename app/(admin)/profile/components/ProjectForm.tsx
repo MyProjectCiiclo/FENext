@@ -10,15 +10,11 @@ type Props = {
   onClose: () => void;
 };
 
-export default function ProjectForm({
-  initialData,
-  onSave,
-  onClose,
-}: Props) {
+export default function ProjectForm({ initialData, onSave, onClose }: Props) {
   const [form, setForm] = useState<Project>({
     id: 0,
     project_name: "",
-    language: "",
+    language: [],
     description: "",
     image_url: null,
     project_type: [],
@@ -37,8 +33,8 @@ export default function ProjectForm({
         project_type: Array.isArray(initialData.project_type)
           ? initialData.project_type
           : initialData.project_type
-          ? (initialData.project_type as string).split(",")
-          : [],
+            ? (initialData.project_type as string).split(",")
+            : [],
       });
 
       setImageFile(null);
@@ -98,13 +94,13 @@ export default function ProjectForm({
 
         <input
           className="w-full border p-3 rounded-xl"
-          placeholder="Language"
-          value={form.language}
+          placeholder="Language (e.g. English, Vietnamese)"
+          value={form.language.join(", ")}
           required
           onChange={(e) =>
             setForm((prev) => ({
               ...prev,
-              language: e.target.value,
+              language: e.target.value.split(",").map((item) => item.trim()),
             }))
           }
         />
