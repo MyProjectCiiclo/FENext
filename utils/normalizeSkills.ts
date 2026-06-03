@@ -1,26 +1,30 @@
-export function normalizeSkills(skills: any[]) {
-  const merged = Object.values(
-    (skills || []).reduce((acc: any, skill: any) => {
-      const key = skill.name.toLowerCase().trim();
+import { Skill } from "@/types";
 
-      if (!acc[key]) {
-        acc[key] = { ...skill };
-      } else {
-        acc[key].weight =
-          (acc[key].weight || 1) + (skill.weight || 1);
-      }
+export function normalizeSkills(skills: Skill[]) {
+  const merged: Record<string, Skill> = {};
 
-      return acc;
-    }, {})
-  );
+  skills.forEach((skill) => {
+    const key = skill.name.toLowerCase().trim();
 
-  const total = merged.reduce(
-    (sum: any, s: any) => sum + (s.weight || 1),
-    0
-  );
+    if (!merged[key]) {
+      merged[key] = {
+        ...skill,
+        weight: skill.weight ?? 1,
+      };
+    } else {
+      merged[key].weight =
+        (merged[key].weight ?? 1) + (skill.weight ?? 1);
+    }
+  });
 
-  return merged.map((s: any) => ({
+  const arr = Object.values(merged);
+
+  const total = arr.reduce((sum: number, s) => {
+    return sum + (s.weight ?? 1);
+  }, 0);
+
+  return arr.map((s) => ({
     ...s,
-    percent: total ? ((s.weight || 1) / total) * 100 : 0,
+    percent: total ? ((s.weight ?? 1) / total) * 100 : 0,
   }));
 }
