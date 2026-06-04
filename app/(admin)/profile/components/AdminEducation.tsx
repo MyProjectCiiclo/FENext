@@ -3,10 +3,10 @@
 import EducationCard from "./EducationCard";
 import LoadingSpinner from "@/shared/Loading";
 import { useEducation } from "@/hooks/useEducation";
-import { useCourseMutation } from "@/hooks";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Education } from "@/types";
+import { useCourseMutation } from '@/hooks';
 
 type EducationField =
   | "school"
