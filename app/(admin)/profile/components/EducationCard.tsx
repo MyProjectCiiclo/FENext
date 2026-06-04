@@ -77,8 +77,7 @@ const EducationCard = React.memo(function EducationCard({
   const courses = eduItem.courses ?? [];
 
   return (
-    <section className="relative bg-white rounded-[32px] border border-pink-100 shadow-lg">
-      <div className="absolute top-10 left-6 w-20 h-20 rounded-[32px] bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center z-10">
+<section className="relative w-full bg-white rounded-[32px] border border-pink-100 shadow-lg">      <div className="absolute top-10 left-6 w-20 h-20 rounded-[32px] bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center z-10">
         <GraduationCap className="text-pink-500" size={36} />
       </div>
 
