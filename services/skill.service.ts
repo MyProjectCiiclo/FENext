@@ -14,22 +14,16 @@ export const skillService = {
   },
 
   async createSkill(formData: FormData) {
-    try {
-      const res = await api.post("/skills/create-skills", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+  try {
+    const res = await api.post("/skills/create-skills", formData);
 
-      console.log("CREATE RES:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("[skillService.createSkill] Error:", error);
+    throw error;
+  }
+},
 
-      return res.data;
-    } catch (error) {
-      console.error("[skillService.createSkill] Error:", error);
-
-      throw error;
-    }
-  },
 
   async updateSkill(id: number, formData: FormData) {
     try {

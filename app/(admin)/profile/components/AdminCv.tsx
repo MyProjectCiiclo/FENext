@@ -10,11 +10,9 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export default function AdminCv() {
   const [edit, setEdit] = useState(false);
-  const [loadingUpload, setLoadingUpload] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState<number | null>(null);
   const [viewUrl, setViewUrl] = useState<string | null>(null);
 
-  const { cv, createCv, deleteCv } = useCv();
+  const { cv, createCv, deleteCv, loading } = useCv();
 
   const getCvUrl = (path: string) => {
     if (!path) return "";
@@ -26,14 +24,11 @@ export default function AdminCv() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setLoadingUpload(true);
-
     try {
       await createCv(file);
     } catch (err) {
-      console.log("UPLOAD ERROR:", err);
+      console.log(err);
     } finally {
-      setLoadingUpload(false);
       e.target.value = "";
     }
   };
@@ -42,20 +37,15 @@ export default function AdminCv() {
     const ok = window.confirm("Delete CV?");
     if (!ok) return;
 
-    setLoadingDelete(id);
-
     try {
       await deleteCv(id);
     } catch (err) {
-      console.log("DELETE ERROR:", err);
-    } finally {
-      setLoadingDelete(null);
+      console.log(err);
     }
   };
 
   const handleDownload = (url: string) => {
     const fileUrl = getCvUrl(url);
-
     const downloadUrl = fileUrl.replace("/upload/", "/upload/fl_attachment/");
 
     const link = document.createElement("a");
@@ -65,6 +55,8 @@ export default function AdminCv() {
     link.click();
     document.body.removeChild(link);
   };
+
+  const isEmpty = !loading && cv && cv.length === 0;
 
   return (
     <section className="bg-white rounded-[32px] border border-pink-100 overflow-hidden">
@@ -86,11 +78,15 @@ export default function AdminCv() {
           <h2 className="text-xl font-semibold">My CV</h2>
         </div>
 
-        {(!cv || cv.length === 0) && (
+        {loading ? (
           <div className="text-center py-10 text-gray-400">
-            <LoadingSpinner/>
+            <LoadingSpinner />
           </div>
-        )}
+        ) : isEmpty ? (
+          <div className="text-center py-10 text-gray-400">
+           No CV has been uploaded yet!
+          </div>
+        ) : null}
 
         <div className="space-y-4">
           {(cv ?? []).map((item: Cv) => {
@@ -123,10 +119,9 @@ export default function AdminCv() {
 
                   <button
                     onClick={() => handleDelete(item.id)}
-                    disabled={loadingDelete === item.id}
                     className="px-3 py-2 bg-red-500 text-white rounded-lg"
                   >
-                    {loadingDelete === item.id ? "..." : <Trash2 size={14} />}
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </div>
@@ -138,7 +133,7 @@ export default function AdminCv() {
           <div className="mt-6">
             <label className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-xl cursor-pointer">
               <Upload size={16} />
-              {loadingUpload ? "Uploading..." : "Upload CV"}
+              Upload CV
 
               <input
                 type="file"

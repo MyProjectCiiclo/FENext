@@ -1,6 +1,7 @@
 "use client";
 
 import useProject from "@/hooks/useProject";
+import LoadingSpinner from "@/shared/Loading";
 import Image from "next/image";
 
 export default function ProjectList() {
@@ -25,8 +26,11 @@ export default function ProjectList() {
             frontend, backend, and full-stack development.
           </p>
         </div>
+
         {loading ? (
-          <p className="text-center text-[#6d4b59]">Loading...</p>
+          <div className="flex justify-center items-center py-20">
+            <LoadingSpinner />
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects?.slice(0, 6).map((project) => (
@@ -34,14 +38,16 @@ export default function ProjectList() {
                 key={project.id}
                 className="bg-white/70 backdrop-blur-md border border-pink-100 rounded-[24px] overflow-hidden shadow-md hover:shadow-xl transition"
               >
-                <div className="relative w-full h-48">
-                  <Image
-                    src={project.image_url || "/default.png"}
-                    alt={project.project_name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+               <div className="relative w-full h-48 mr-2 flex items-center justify-center bg-pink-50 rounded-xl overflow-hidden">
+  <div className="relative w-[260px] h-[160px]">
+    <Image
+      src={project.image_url || "/default.png"}
+      alt={project.project_name}
+      fill
+      className="object-cover rounded-lg"
+    />
+  </div>
+</div>
 
                 <div className="p-5">
                   <h3 className="text-xl font-semibold text-[#6d4b59] mb-2">

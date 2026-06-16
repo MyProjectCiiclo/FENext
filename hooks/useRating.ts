@@ -5,6 +5,11 @@ import { ratingService } from "@/services";
 import { Rating } from "@/types";
 import toast from "react-hot-toast";
 
+type CreateRatingDTO = {
+  name: string;
+  message: string;
+};
+
 export function useRating() {
   const queryClient = useQueryClient();
 
@@ -14,14 +19,37 @@ export function useRating() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => ratingService.deleteRating(id),
+  const createMutation = useMutation({
+    mutationFn: (data: CreateRatingDTO) => ratingService.sendRating(data),
+
+    onMutate: () => {
+      toast.loading("Sending message...", { id: "ratings" });
+    },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ratings"] });
-      toast.success("Delete success!");
+      toast.success("Thank you for your feedback!", { id: "ratings" });
     },
+
     onError: () => {
-      toast.error("Something went wrong");
+      toast.error("Failed to submit rating", { id: "ratings" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => ratingService.deleteRating(id),
+
+    onMutate: () => {
+      toast.loading("Deleting loading...", { id: "delete-rating" });
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ratings"] });
+      toast.success("Delete success!", { id: "delete-rating" });
+    },
+
+    onError: () => {
+      toast.error("Something went wrong", { id: "delete-rating" });
     },
   });
 
@@ -31,6 +59,8 @@ export function useRating() {
     error: query.error,
 
     getRating: query.refetch,
-    deleteRating: deleteMutation.mutateAsync,
+
+    createRating: createMutation.mutate,
+    deleteRating: deleteMutation.mutate,
   };
 }

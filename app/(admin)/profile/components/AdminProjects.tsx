@@ -20,6 +20,9 @@ export default function AdminProjects() {
     createProject,
     updateProject,
     deleteProject,
+    createLoading,
+    updateLoading,
+    deleteLoading,
   } = useProject(page);
 
   const [editMode, setEditMode] = useState(false);
@@ -27,13 +30,11 @@ export default function AdminProjects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
+  const isSubmitting = createLoading || updateLoading || deleteLoading;
+
   const getImage = (img: string | File | null) => {
     if (!img) return "/default-project.png";
-
-    if (img instanceof File) {
-      return URL.createObjectURL(img);
-    }
-
+    if (img instanceof File) return URL.createObjectURL(img);
     return img;
   };
 
@@ -48,13 +49,13 @@ export default function AdminProjects() {
       project_type: Array.isArray(project.project_type)
         ? project.project_type
         : project.project_type
-          ? (project.project_type as string).split(",")
-          : [],
+        ? (project.project_type as string).split(",")
+        : [],
       language: Array.isArray(project.language)
         ? project.language
         : project.language
-          ? (project.language as string).split(",")
-          : [],
+        ? (project.language as string).split(",")
+        : [],
     });
 
     setOpen(true);
@@ -67,13 +68,8 @@ export default function AdminProjects() {
   const confirmDeleteProject = async () => {
     if (!deleteId) return;
 
-    try {
-      await deleteProject(deleteId);
-    } catch (error) {
-      console.log("DELETE ERROR:", error);
-    } finally {
-      setDeleteId(null);
-    }
+    await deleteProject(deleteId);
+    setDeleteId(null);
   };
 
   const handleSave = async (data: Project, file: File | null) => {
@@ -86,35 +82,31 @@ export default function AdminProjects() {
       "language",
       Array.isArray(data.language)
         ? data.language.join(",")
-        : (data.language ?? ""),
+        : (data.language ?? "")
     );
 
     formData.append(
       "project_type",
       Array.isArray(data.project_type)
         ? data.project_type.join(",")
-        : (data.project_type ?? ""),
+        : (data.project_type ?? "")
     );
 
     if (file) {
       formData.append("image_url", file);
     }
 
-    try {
-      if (selectedProject?.id) {
-        await updateProject({
-          id: Number(selectedProject.id),
-          data: formData,
-        });
-      } else {
-        await createProject(formData);
-      }
-
-      setOpen(false);
-      setSelectedProject(null);
-    } catch (error: unknown) {
-      console.log("FULL ERROR:", error);
+    if (selectedProject?.id) {
+      await updateProject({
+        id: Number(selectedProject.id),
+        data: formData,
+      });
+    } else {
+      await createProject(formData);
     }
+
+    setOpen(false);
+    setSelectedProject(null);
   };
 
   if (loading) return <LoadingSpinner />;
@@ -142,9 +134,10 @@ export default function AdminProjects() {
 
           <button
             onClick={handleAdd}
-            className="bg-pink-500 text-white px-5 py-2 rounded-xl"
+            disabled={isSubmitting}
+            className="bg-pink-500 text-white px-5 py-2 rounded-xl disabled:opacity-50"
           >
-            Add Project
+            {createLoading ? "Creating..." : "Add Project"}
           </button>
         </div>
 
@@ -166,7 +159,17 @@ export default function AdminProjects() {
               <div className="p-5">
                 <h3 className="font-bold">{project.project_name}</h3>
 
-                <p className="text-sm text-gray-500">{project.description}</p>
+ <p className="text-sm text-pink-500 mt-1">
+                  {project.language}
+                </p>
+                
+  <p className="text-sm text-pink-500 mt-1">
+                  <span className= "text-black">Project Type - </span>
+                    {project.project_type}
+                  </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {project.description}
+                </p>
 
                 {editMode && (
                   <div className="absolute top-3 right-3 flex gap-2">
@@ -188,7 +191,7 @@ export default function AdminProjects() {
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-4 py-2 bg-pink-500 text-white rounded-xl"
+            className="px-4 py-2 bg-pink-500 text-white rounded-xl disabled:opacity-50"
           >
             Previous
           </button>
@@ -200,7 +203,7 @@ export default function AdminProjects() {
           <button
             disabled={page === meta?.last_page}
             onClick={() => setPage((p) => p + 1)}
-            className="px-4 py-2 bg-pink-500 text-white rounded-xl"
+            className="px-4 py-2 bg-pink-500 text-white rounded-xl disabled:opacity-50"
           >
             Next
           </button>

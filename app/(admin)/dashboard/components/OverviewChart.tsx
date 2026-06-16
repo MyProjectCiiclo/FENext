@@ -13,9 +13,10 @@ import {
 
 import { useGithub } from "@/hooks/useGithub";
 import { ContributionWeek } from "@/types";
+import LoadingSpinner from "@/shared/Loading";
 
 export default function OverviewChart() {
-  const { contributions } = useGithub();
+  const { contributions, loading } = useGithub();
 
   const chartData = useMemo(() => {
     if (!contributions?.weeks) return [];
@@ -24,9 +25,17 @@ export default function OverviewChart() {
       week.contributionDays.map((day) => ({
         date: day.date,
         contributions: day.contributionCount,
-      })),
+      }))
     );
   }, [contributions]);
+
+  if (loading) {
+    return (
+      <div className="w-full h-[300px] flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 border border-pink-100 rounded-2xl bg-white/60 backdrop-blur-md">
