@@ -4,6 +4,7 @@ import { useGithub } from "@/hooks/useGithub";
 import { useSkill } from "@/hooks/useSkill";
 import { Users, Eye, BarChart3, Trophy } from "lucide-react";
 import { useContact } from "@/hooks/useContact";
+import LoadingSpinner from "@/shared/Loading";
 
 type StatCardProps = {
   title: string;
@@ -46,12 +47,22 @@ function StatCard({ title, value, color, icon }: StatCardProps) {
 }
 
 export default function StatCards() {
-  const { githubUser } = useGithub();
-  const { skills } = useSkill();
-  const { contacts } = useContact();
+  const { githubUser, loading: githubLoading } = useGithub();
+  const { skills, loading: skillLoading } = useSkill();
+  const { contacts, loading: contactLoading } = useContact();
+
+  const loading = githubLoading || skillLoading || contactLoading;
+
+  if (loading) {
+    return (
+      <div className="w-full flex justify-center items-center min-h-[200px]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   const projects = githubUser?.public_repos ?? 0;
-  const totalSkills = skills?.length ?? 0; 
+  const totalSkills = skills?.length ?? 0;
   const totalContacts = contacts?.length ?? 0;
 
   return (

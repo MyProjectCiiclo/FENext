@@ -16,10 +16,15 @@ export function useEducation() {
     },
     staleTime: 1000 * 60 * 5,
   });
+
   const createEdu = useMutation({
     mutationFn: async (data: UpdateEducationDTO) => {
       const res = await EducationService.sendEdu(data);
       return res.data as Education;
+    },
+
+    onMutate: () => {
+      toast.loading("Creating education...", { id: "create-edu" });
     },
 
     onSuccess: (newItem) => {
@@ -28,7 +33,13 @@ export function useEducation() {
         newItem,
       ]);
 
-      toast.success("Education created successfully");
+      toast.success("Education created successfully", {
+        id: "create-edu",
+      });
+    },
+
+    onError: () => {
+      toast.error("Create failed", { id: "create-edu" });
     },
   });
 
@@ -45,6 +56,8 @@ export function useEducation() {
     },
 
     onMutate: async ({ id, data }) => {
+      toast.loading("Updating education...", { id: "update-edu" });
+
       await queryClient.cancelQueries({ queryKey: ["education"] });
 
       const prev = queryClient.getQueryData<Education[]>(["education"]);
@@ -60,10 +73,13 @@ export function useEducation() {
 
     onError: (_err, _vars, context) => {
       queryClient.setQueryData(["education"], context?.prev);
+      toast.error("Update failed", { id: "update-edu" });
     },
 
     onSuccess: () => {
-      toast.success("Education updated successfully");
+      toast.success("Education updated successfully", {
+        id: "update-edu",
+      });
     },
 
     onSettled: () => {
@@ -78,6 +94,8 @@ export function useEducation() {
     },
 
     onMutate: async (id) => {
+      toast.loading("Deleting education...", { id: "delete-edu" });
+
       await queryClient.cancelQueries({ queryKey: ["education"] });
 
       const prev = queryClient.getQueryData<Education[]>(["education"]);
@@ -91,10 +109,13 @@ export function useEducation() {
 
     onError: (_err, _id, context) => {
       queryClient.setQueryData(["education"], context?.prev);
+      toast.error("Delete failed", { id: "delete-edu" });
     },
 
     onSuccess: () => {
-      toast.success("Education deleted successfully");
+      toast.success("Education deleted successfully", {
+        id: "delete-edu",
+      });
     },
 
     onSettled: () => {
@@ -107,8 +128,12 @@ export function useEducation() {
     loading: query.isLoading,
     error: query.error,
 
-    createEdu,
-    updateEdu: updateEdu.mutate,
-    deleteEdu: deleteEdu.mutate,
+    createEdu: createEdu.mutateAsync,
+    updateEdu: updateEdu.mutateAsync,
+    deleteEdu: deleteEdu.mutateAsync,
+
+    isCreating: createEdu.isPending,
+    isUpdating: updateEdu.isPending,
+    isDeleting: deleteEdu.isPending,
   };
 }

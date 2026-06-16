@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { useGithub } from "@/hooks";
 import { ContributionWeek } from "@/types";
+import LoadingSpinner from "@/shared/Loading";
 
 export default function GithubActivity() {
   const { loading, githubUser, contributions } = useGithub();
@@ -65,7 +66,9 @@ export default function GithubActivity() {
         </div>
 
         {loading ? (
-          <p className="text-[#6d4b59]">Loading...</p>
+          <div >
+            <LoadingSpinner/>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <div className="min-w-[900px]">

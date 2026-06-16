@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { projectService } from "@/services";
 import { Project } from "@/types";
+import { toast } from "react-hot-toast";
 
 export default function useProject(page: number = 1) {
   const queryClient = useQueryClient();
@@ -15,23 +16,68 @@ export default function useProject(page: number = 1) {
 
   const createMutation = useMutation({
     mutationFn: projectService.sendProject,
-    onSuccess: () => {
+
+    onMutate: () => {
+      const id = toast.loading("Creating project...");
+      return { toastId: id };
+    },
+
+    onSuccess: (_, __, ctx) => {
+      toast.success("Project created!", {
+        id: ctx?.toastId,
+      });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+
+    onError: (err: any, __, ctx) => {
+      toast.error(err?.message || "Create failed", {
+        id: ctx?.toastId,
+      });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: FormData }) =>
       projectService.updateProject(id, data),
-    onSuccess: () => {
+
+    onMutate: () => {
+      const id = toast.loading("Updating project...");
+      return { toastId: id };
+    },
+
+    onSuccess: (_, __, ctx) => {
+      toast.success("Project updated!", {
+        id: ctx?.toastId,
+      });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+
+    onError: (err: any, __, ctx) => {
+      toast.error(err?.message || "Update failed", {
+        id: ctx?.toastId,
+      });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => projectService.deleteProject(id),
-    onSuccess: () => {
+
+    onMutate: () => {
+      const id = toast.loading("Deleting project...");
+      return { toastId: id };
+    },
+
+    onSuccess: (_, __, ctx) => {
+      toast.success("Project deleted!", {
+        id: ctx?.toastId,
+      });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+
+    onError: (err: any, __, ctx) => {
+      toast.error(err?.message || "Delete failed", {
+        id: ctx?.toastId,
+      });
     },
   });
 

@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { useProfile } from "@/hooks";
 
 export default function Header() {
   const { profile, loading } = useProfile();
+  const [openMenu, setOpenMenu] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#f3d8e4] bg-[#FDF0F5]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-[#f3d8e4] bg-[#FDF0F5]/90 backdrop-blur-xl relative">
       <div className="mx-auto flex items-center justify-between px-4 lg:px-[180px] py-2">
         <div className="flex items-center gap-4 cursor-pointer group">
           <div className="relative w-[50px] h-[50px] rounded-full overflow-hidden">
@@ -40,6 +42,9 @@ export default function Header() {
               <Link href="/#about">About</Link>
             </li>
             <li>
+              <Link href="/#work">Experience</Link>
+            </li>
+            <li>
               <Link href="/#skills">Skills</Link>
             </li>
             <li>
@@ -54,8 +59,78 @@ export default function Header() {
           </button>
         </div>
 
-        <button className="md:hidden text-[#6d4b59] text-2xl">☰</button>
+        <button
+          className="md:hidden text-[#6d4b59] text-3xl"
+          onClick={() => setOpenMenu(!openMenu)}
+        >
+          ☰
+        </button>
       </div>
+
+      {openMenu && (
+        <div className="absolute top-full left-0 w-full bg-[#FDF0F5] border-t border-[#f3d8e4] shadow-lg z-50 md:hidden">
+          <ul className="flex flex-col text-[#6d4b59] font-medium">
+            <li>
+              <Link
+                href="/#intro"
+                className="block px-6 py-4 hover:bg-pink-50"
+                onClick={() => setOpenMenu(false)}
+              >
+                Home
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/#about"
+                className="block px-6 py-4 hover:bg-pink-50"
+                onClick={() => setOpenMenu(false)}
+              >
+                About
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/#work"
+                className="block px-6 py-4 hover:bg-pink-50"
+                onClick={() => setOpenMenu(false)}
+              >
+                Experience
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/#skills"
+                className="block px-6 py-4 hover:bg-pink-50"
+                onClick={() => setOpenMenu(false)}
+              >
+                Skills
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/#contact"
+                className="block px-6 py-4 hover:bg-pink-50"
+                onClick={() => setOpenMenu(false)}
+              >
+                Contact
+              </Link>
+            </li>
+
+            <li className="px-6 py-4">
+              <button
+                className="w-full px-5 py-3 rounded-full bg-pink-400 text-white font-semibold"
+                onClick={() => setOpenMenu(false)}
+              >
+                Hire Me
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
     </header>
   );
 }

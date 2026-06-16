@@ -12,7 +12,7 @@ export default function IntroSection() {
   return (
     <section
       id="home"
-      className=" bg-[#FDF0F5] text-white px-6 lg:px-[180px]"
+      className=" bg-[#FDF0F5] text-white px-6 lg:px-[180px] pt-2"
     >
       <div className="relative grid lg:grid-cols-2 gap-12 items-center">
         <div>

@@ -40,6 +40,9 @@ type Props = {
   onAddCourse: (id: number) => void;
   onUpdateCourse: (eduId: number, courseId: number, name: string) => void;
   onDeleteCourse: (eduId: number, courseId: number) => void;
+
+  isUpdating?: boolean;
+  isDeleting?: boolean;
 };
 
 const EducationCard = React.memo(function EducationCard({
@@ -55,11 +58,14 @@ const EducationCard = React.memo(function EducationCard({
   onAddCourse,
   onUpdateCourse,
   onDeleteCourse,
+  isUpdating,
+  isDeleting,
 }: Props) {
   const [editingCourseId, setEditingCourseId] = useState<number | null>(null);
   const [courseName, setCourseName] = useState("");
   const [deleteCourseId, setDeleteCourseId] = useState<number | null>(null);
   const [deleteEduConfirm, setDeleteEduConfirm] = useState(false);
+
   useEffect(() => {
     setEditingCourseId(null);
     setCourseName("");
@@ -70,6 +76,7 @@ const EducationCard = React.memo(function EducationCard({
   };
 
   const handleSave = async () => {
+    if (isUpdating) return;
     await onSave(eduItem.id);
     setEditId(null);
   };
@@ -77,7 +84,8 @@ const EducationCard = React.memo(function EducationCard({
   const courses = eduItem.courses ?? [];
 
   return (
-<section className="relative w-full bg-white rounded-[32px] border border-pink-100 shadow-lg">      <div className="absolute top-10 left-6 w-20 h-20 rounded-[32px] bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center z-10">
+    <section className="relative w-full bg-white rounded-[32px] border border-pink-100 shadow-lg">
+      <div className="absolute top-10 left-6 w-20 h-20 rounded-[32px] bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center z-10">
         <GraduationCap className="text-pink-500" size={36} />
       </div>
 
@@ -85,7 +93,8 @@ const EducationCard = React.memo(function EducationCard({
         <div className="absolute top-5 right-5 flex gap-3">
           <button
             onClick={() => setEditId(isEditing ? null : eduItem.id)}
-            className="px-4 py-2 rounded-2xl bg-white/20 text-white flex items-center gap-2"
+            disabled={isUpdating}
+            className="px-4 py-2 rounded-2xl bg-white/20 text-white flex items-center gap-2 disabled:opacity-50"
           >
             <Pencil size={16} />
             {isEditing ? "Close" : "Edit"}
@@ -94,10 +103,11 @@ const EducationCard = React.memo(function EducationCard({
           {isEditing && (
             <button
               onClick={() => setDeleteEduConfirm(true)}
-              className="px-4 py-2 rounded-2xl bg-red-500/70 text-white flex items-center gap-2"
+              disabled={isDeleting}
+              className="px-4 py-2 rounded-2xl bg-red-500/70 text-white flex items-center gap-2 disabled:opacity-50"
             >
               <Trash2 size={16} />
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </button>
           )}
         </div>
@@ -157,6 +167,7 @@ const EducationCard = React.memo(function EducationCard({
 
                 {isEditing && (
                   <button
+                    disabled={isUpdating}
                     onClick={() => {
                       setEditingCourseId(course.id);
                       setCourseName(course.name);
@@ -168,6 +179,7 @@ const EducationCard = React.memo(function EducationCard({
 
                 {editingCourseId === course.id && (
                   <button
+                    disabled={isUpdating}
                     onClick={() => {
                       onUpdateCourse(eduItem.id, course.id, courseName);
                       setEditingCourseId(null);
@@ -178,7 +190,10 @@ const EducationCard = React.memo(function EducationCard({
                 )}
 
                 {isEditing && (
-                  <button onClick={() => setDeleteCourseId(course.id)}>
+                  <button
+                    disabled={isDeleting}
+                    onClick={() => setDeleteCourseId(course.id)}
+                  >
                     <X size={14} />
                   </button>
                 )}
@@ -201,7 +216,8 @@ const EducationCard = React.memo(function EducationCard({
 
               <button
                 onClick={() => onAddCourse(eduItem.id)}
-                className="bg-pink-500 text-white px-5 rounded-2xl"
+                disabled={isUpdating}
+                className="bg-pink-500 text-white px-5 rounded-2xl disabled:opacity-50"
               >
                 <Plus size={18} />
               </button>
@@ -211,10 +227,11 @@ const EducationCard = React.memo(function EducationCard({
           {isEditing && (
             <button
               onClick={handleSave}
-              className="mt-6 w-full bg-gradient-to-r from-pink-500 to-rose-400 text-white py-3 rounded-2xl flex items-center justify-center gap-2"
+              disabled={isUpdating}
+              className="mt-6 w-full bg-gradient-to-r from-pink-500 to-rose-400 text-white py-3 rounded-2xl flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <Save size={18} />
-              Save Changes
+              {isUpdating ? "Saving..." : "Save Changes"}
             </button>
           )}
         </div>
@@ -250,6 +267,7 @@ const EducationCard = React.memo(function EducationCard({
           </div>
         </div>
       )}
+
       {deleteEduConfirm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl w-[340px] shadow-xl">

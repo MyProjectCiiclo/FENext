@@ -11,6 +11,8 @@ export default function ContactManagement() {
   const { contacts, deleteContact, loading } = useContact();
 
   const [page, setPage] = useState(1);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+
   const pageSize = 9;
 
   const totalPages = Math.ceil(contacts.length / pageSize);
@@ -22,7 +24,6 @@ export default function ContactManagement() {
 
   return (
     <section className="relative bg-white rounded-[32px] border border-pink-100 shadow-sm overflow-hidden">
-
       <div className="h-24 bg-gradient-to-r from-pink-400 via-pink-300 to-rose-200" />
 
       <div className="absolute left-8 top-14 w-20 h-20 rounded-3xl bg-white border-4 border-pink-100 shadow-xl flex items-center justify-center">
@@ -68,7 +69,7 @@ export default function ContactManagement() {
 
                   <div className="absolute top-3 right-3">
                     <button
-                      onClick={() => deleteContact(contact.id)}
+                      onClick={() => setDeleteId(contact.id)}
                       className="bg-white p-2 rounded-full shadow hover:bg-red-50 transition"
                     >
                       <Trash2 size={18} className="text-red-400" />
@@ -82,7 +83,6 @@ export default function ContactManagement() {
 
         {!loading && contacts.length > 0 && (
           <div className="flex items-center justify-center gap-4 mt-10">
-            
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
@@ -105,6 +105,43 @@ export default function ContactManagement() {
           </div>
         )}
       </div>
+
+      {deleteId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white w-[420px] rounded-2xl p-6 shadow-lg">
+            <h2 className="text-xl font-bold text-[#6d4b59]">
+              Confirm Delete
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              Are you sure you want to delete this contact? This action cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setDeleteId(null)}
+                className="px-4 py-2 rounded-xl bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  if (deleteId !== null) {
+                    deleteContact(deleteId);
+                    setDeleteId(null);
+                  }
+                }}
+                className="px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
+
+

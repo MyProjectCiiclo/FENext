@@ -4,6 +4,7 @@ import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const { infoUser, loading } = useUser();
@@ -14,14 +15,36 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) return;
+    const toastId = toast.loading("Signing in...");
 
-    const success = await infoUser({ email, password });
+    if (!email || !password) {
+      toast.error("Please enter email and password", {
+        id: toastId,
+      });
+      return;
+    }
 
-    if (success) {
-      setEmail("");
-      setPassword("");
-      router.push("/dashboard");
+    try {
+      const success = await infoUser({ email, password });
+
+      if (success) {
+        toast.success("Login successful", {
+          id: toastId,
+        });
+
+        setEmail("");
+        setPassword("");
+
+        router.push("/dashboard");
+      } else {
+        toast.error("Invalid email or password", {
+          id: toastId,
+        });
+      }
+    } catch (err) {
+      toast.error("Invalid email or password", {
+        id: toastId,
+      });
     }
   };
 
@@ -34,14 +57,11 @@ export default function Login() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-pink-50">
       <div className="flex flex-col items-center p-8 rounded-2xl shadow-2xl bg-white/80 backdrop-blur-md w-full max-w-[500px] border border-pink-100">
-
         <h1 className="text-2xl font-semibold mb-2 text-pink-400">
           Welcome Back
         </h1>
 
-        <p className="text-sm text-gray-500 mb-6">
-          Admin login to continue
-        </p>
+        <p className="text-sm text-gray-500 mb-6">Admin login to continue</p>
 
         <div className="mb-4 w-full">
           <input
