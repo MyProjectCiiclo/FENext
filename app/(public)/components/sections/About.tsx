@@ -2,7 +2,7 @@
 
 import { useProfile, useSkill } from "@/hooks";
 import LoadingSpinner from "@/shared/Loading";
-
+import { Skill } from "@/types";
 export default function About() {
   const { profile } = useProfile();
   const { skills } = useSkill();
@@ -56,7 +56,7 @@ export default function About() {
               </h3>
 
               {skills?.length ? (
-                skills.map((skill) => {
+                skills.map((skill: Skill) => {
                   const percentage = Math.min(
                     Math.max(Number(skill.weight) || 0, 0),
                     100

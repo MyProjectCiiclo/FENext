@@ -93,5 +93,9 @@ export default function useProject(page: number = 1) {
     createProject: createMutation.mutateAsync,
     updateProject: updateMutation.mutateAsync,
     deleteProject: deleteMutation.mutateAsync,
+
+ createLoading: createMutation.isPending,
+  updateLoading: updateMutation.isPending,
+  deleteLoading: deleteMutation.isPending,
   };
 }
