@@ -74,20 +74,20 @@ export default function AdminEducation() {
     setEditId(null);
   };
 
-  const handleSaveNewEducation = async () => {
-    await createEdu.mutateAsync(newEducation as any);
+const handleSaveNewEducation = async () => {
+  await createEdu(newEducation as any);
 
-    setNewEducation({
-      school: "",
-      degree: "",
-      major: "",
-      description: "",
-      start_date: "",
-      end_date: "",
-    });
+  setNewEducation({
+    school: "",
+    degree: "",
+    major: "",
+    description: "",
+    start_date: "",
+    end_date: "",
+  });
 
-    setIsCreating(false);
-  };
+  setIsCreating(false);
+};
 
   const handleAddCourse = async (eduId: number) => {
     const name = newCourse[eduId];

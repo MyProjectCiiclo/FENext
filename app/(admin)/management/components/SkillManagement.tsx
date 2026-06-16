@@ -35,12 +35,8 @@ export default function SkillManagement() {
     createSkill,
     updateSkill,
     deleteSkill,
-    createLoading,
-    updateLoading,
-    deleteLoading,
   } = useSkill();
 
-  const isMutating = createLoading || updateLoading || deleteLoading;
 
   const totalPages = Math.ceil(skills.length / pageSize);
 
