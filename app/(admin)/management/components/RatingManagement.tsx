@@ -10,8 +10,9 @@ export default function RatingManagement() {
   const { ratings, loading, deleteRating } = useRating();
 
   const [page, setPage] = useState(1);
-  const pageSize = 9;
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
+  const pageSize = 9;
   const isLoading = loading;
 
   const totalPages = Math.ceil(ratings.length / pageSize);
@@ -41,9 +42,7 @@ export default function RatingManagement() {
             <LoadingSpinner />
           </div>
         ) : currentData.length === 0 ? (
-          <p className="text-center text-gray-400 mt-10">
-            No ratings yet
-          </p>
+          <p className="text-center text-gray-400 mt-10">No ratings yet</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
             {currentData.map((review: Rating) => (
@@ -74,13 +73,7 @@ export default function RatingManagement() {
 
                   <div className="absolute top-3 right-3 flex gap-2 z-10">
                     <button
-                      onClick={() => {
-                        const ok = window.confirm(
-                          "Are you sure you want to delete this rating?"
-                        );
-
-                        if (ok) deleteRating(review.id);
-                      }}
+                      onClick={() => setDeleteId(review.id)}
                       className="bg-white p-2 rounded-full shadow hover:bg-red-50 transition"
                     >
                       <Trash2 size={18} className="text-red-400" />
@@ -116,6 +109,39 @@ export default function RatingManagement() {
           </div>
         )}
       </div>
+
+      {deleteId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white w-[400px] rounded-2xl p-6 shadow-lg">
+            <h2 className="text-xl font-bold text-[#6d4b59]">
+              Confirm Delete
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              Are you sure you want to delete this rating? This action cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setDeleteId(null)}
+                className="px-4 py-2 rounded-xl bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  deleteRating(deleteId);
+                  setDeleteId(null);
+                }}
+                className="px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

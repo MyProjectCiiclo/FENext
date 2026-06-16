@@ -19,33 +19,37 @@ export function useContact() {
   });
 
   const sendMutation = useMutation({
-    mutationFn: (payload: Contact) =>
-      contactService.sendContact(payload),
+    mutationFn: (payload: Contact) => contactService.sendContact(payload),
 
-    onSuccess: () => {
-      toast.success("Send success!");
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    onMutate: () => {
+      toast.loading("Sending message...", { id: "contact" });
     },
 
-    onError: (err) => {
-      console.log(err);
-      toast.error("Something went wrong");
+    onSuccess: () => {
+      toast.success("Message sent successfully!", { id: "contact" });
+    },
+
+    onError: () => {
+      toast.error("Failed to send message", { id: "contact" });
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => contactService.deleteContact(id),
+const deleteMutation = useMutation({
+  mutationFn: (id: number) => contactService.deleteContact(id),
 
-    onSuccess: () => {
-      toast.success("Delete success!");
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-    },
+  onMutate: () => {
+    toast.loading("Deleting loading...", { id: "contacts" });
+  },
 
-    onError: (err) => {
-      console.log(err);
-      toast.error("Something went wrong");
-    },
-  });
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    toast.success("Delete success!", { id: "contacts" });
+  },
+
+  onError: () => {
+    toast.error("Something went wrong", { id: "contacts" });
+  },
+});
 
   return {
     contacts: query.data ?? [],

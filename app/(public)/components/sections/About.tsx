@@ -1,18 +1,16 @@
 "use client";
 
-import { useAbout, useProfile, useSkill } from "@/hooks";
-import { normalizeSkills } from "@/utils/normalizeSkills";
+import { useProfile, useSkill } from "@/hooks";
+import LoadingSpinner from "@/shared/Loading";
 
 export default function About() {
   const { profile } = useProfile();
   const { skills } = useSkill();
 
-  const normalizedSkills = normalizeSkills(skills || []);
-
   return (
     <section
       id="about"
-      className=" bg-[#FDF0F5]/90 text-white px-6 py-16 lg:px-[180px]"
+      className="bg-[#FDF0F5]/90 text-white px-6 py-16 lg:px-[180px]"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -57,21 +55,34 @@ export default function About() {
                 Technical Proficiency
               </h3>
 
-              {normalizedSkills.map((skill) => (
-                <div key={skill.id} className="mb-6">
-                  <div className="flex justify-between text-sm mb-2 text-[#6d4b59] font-medium">
-                    <span>{skill.name}</span>
-                    <span>{Math.round(skill.percent)}%</span>
-                  </div>
+              {skills?.length ? (
+                skills.map((skill) => {
+                  const percentage = Math.min(
+                    Math.max(Number(skill.weight) || 0, 0),
+                    100
+                  );
 
-                  <div className="w-full h-3 bg-[#6d4b59] rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-pink-400 rounded-full"
-                      style={{ width: `${skill.percent}%` }}
-                    />
+                  return (
+                    <div key={skill.id} className="mb-6">
+                      <div className="flex justify-between text-sm mb-2 text-[#6d4b59] font-medium">
+                        <span>{skill.name}</span>
+                        <span>{percentage}%</span>
+                      </div>
+
+                      <div className="w-full h-3 bg-[#6d4b59] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-pink-400 rounded-full transition-all duration-500"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                 <div>
+                  <LoadingSpinner/>
                   </div>
-                </div>
-              ))}
+              )}
             </div>
 
             <div className="mt-12">
@@ -80,8 +91,8 @@ export default function About() {
               </h3>
 
               <p className="text-[#6d4b59] text-sm lg:text-base leading-8">
-                {profile?.title} with {profile?.experience_years} of experience
-                building scalable web applications.
+                {profile?.title} with {profile?.experience_years} years of
+                experience building scalable web applications.
               </p>
             </div>
           </div>

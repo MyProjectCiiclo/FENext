@@ -11,7 +11,7 @@ import LoadingSpinner from "@/shared/Loading";
 export default function AdminProfileInfo() {
   const [editMode, setEditMode] = useState(false);
 
-  const { profile, updateProfile, loading } = useProfile();
+  const { profile, updateProfile, loading, isUpdating } = useProfile();
 
   const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -32,15 +32,21 @@ export default function AdminProfileInfo() {
     if (!profile) return;
 
     setForm({
-      full_name: profile?.full_name ?? "",
-      title: profile?.title ?? "",
-      description: profile?.description ?? "",
-      phone: profile?.phone ?? "",
-      location: profile?.location ?? "",
-      github: profile?.github ?? "",
-      linkedin: profile?.linkedin ?? "",
+      full_name: profile.full_name ?? "",
+      title: profile.title ?? "",
+      description: profile.description ?? "",
+      phone: profile.phone ?? "",
+      location: profile.location ?? "",
+      github: profile.github ?? "",
+      linkedin: profile.linkedin ?? "",
     });
   }, [profile]);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -48,24 +54,31 @@ export default function AdminProfileInfo() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const normalizeUrl = (url: string) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    return `https://${url}`;
+  };
+
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
 
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   };
 
   const handleSave = async () => {
+    if (isUpdating) return;
+    if (!form.full_name.trim()) return;
+
     const formData = new FormData();
 
-    formData.append("full_name", form.full_name);
-    formData.append("title", form.title);
-    formData.append("description", form.description);
-    formData.append("phone", form.phone);
-    formData.append("location", form.location);
-    formData.append("github", form.github);
-    formData.append("linkedin", form.linkedin);
+    Object.entries(form).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
 
     if (avatarFile) {
       formData.append("avatar", avatarFile);
@@ -81,7 +94,7 @@ export default function AdminProfileInfo() {
   if (loading) return <LoadingSpinner />;
   if (!profile) return <LoadingSpinner />;
 
-  const avatarSrc = avatarPreview || profile?.avatar || "/default-project.png";
+  const avatarSrc = avatarPreview || profile.avatar || "/default-project.png";
 
   return (
     <section className="relative overflow-hidden rounded-[32px] border border-pink-100 bg-white shadow-sm">
@@ -89,7 +102,8 @@ export default function AdminProfileInfo() {
 
       <button
         onClick={() => setEditMode((v) => !v)}
-        className="absolute right-5 top-5 z-30 flex items-center gap-2 rounded-2xl bg-white/20 px-5 py-2 text-white backdrop-blur-sm"
+        disabled={isUpdating}
+        className="absolute right-5 top-5 z-30 flex items-center gap-2 rounded-2xl bg-white/20 px-5 py-2 text-white backdrop-blur-sm disabled:opacity-50"
       >
         <Pencil size={18} />
         {editMode ? "Close Edit" : "Edit Profile"}
@@ -222,9 +236,9 @@ export default function AdminProfileInfo() {
                 />
               ) : (
                 <a
-                  href={form.github}
+                  href={normalizeUrl(form.github)}
                   target="_blank"
-                  className="text-pink-500 hover:text-pink-600 underline"
+                  className="text-pink-500 underline"
                 >
                   {form.github || "Not set"}
                 </a>
@@ -245,9 +259,9 @@ export default function AdminProfileInfo() {
                 />
               ) : (
                 <a
-                  href={form.linkedin}
+                  href={normalizeUrl(form.linkedin)}
                   target="_blank"
-                  className="text-pink-500 hover:text-pink-600 underline"
+                  className="text-pink-500 underline"
                 >
                   {form.linkedin || "Not set"}
                 </a>
@@ -258,9 +272,10 @@ export default function AdminProfileInfo() {
           {editMode && (
             <button
               onClick={handleSave}
-              className="mt-4 rounded-xl bg-pink-500 py-3 text-white transition hover:bg-pink-600"
+              disabled={isUpdating}
+              className="mt-4 rounded-xl bg-pink-500 py-3 text-white transition hover:bg-pink-600 disabled:opacity-50"
             >
-              Save Changes
+              {isUpdating ? "Saving..." : "Save Changes"}
             </button>
           )}
         </div>

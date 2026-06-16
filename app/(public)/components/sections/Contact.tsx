@@ -1,17 +1,17 @@
 "use client";
 
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Eye } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
-import { Eye } from "lucide-react";
 import { useContact } from "@/hooks/useContact";
 import { useState } from "react";
 import { useProfile, useCv } from "@/hooks";
 import type { Contact } from "@/types";
+import LoadingSpinner from "@/shared/Loading";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export default function Contact() {
-  const { sendContact } = useContact();
+  const { sendContact, isSending } = useContact();
   const { profile } = useProfile();
   const { cv } = useCv();
 
@@ -39,6 +39,7 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     await sendContact(formData);
 
     setFormData({
@@ -57,9 +58,7 @@ export default function Contact() {
 
   const handleView = (url?: string) => {
     if (!url) return;
-
-    const fileUrl = getCvUrl(url);
-    setViewUrl(fileUrl);
+    setViewUrl(getCvUrl(url));
   };
 
   const handleDownload = (url?: string) => {
@@ -79,6 +78,8 @@ export default function Contact() {
   return (
     <section id="contact" className="bg-[#FDF0F5] px-6 py-10 lg:px-[180px]">
       <div className="max-w-7xl mx-auto">
+
+        {/* HEADER */}
         <div className="text-center mb-16">
           <div className="inline-block bg-[#f8d9e5] text-pink-400 px-8 py-3 rounded-xl text-lg font-semibold mb-6">
             Contact Me
@@ -94,46 +95,59 @@ export default function Contact() {
           </p>
         </div>
 
+        {/* BODY */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+          {/* LEFT */}
           <div className="bg-white/70 backdrop-blur-md border border-pink-100 p-8 rounded-[32px]">
             <h2 className="text-2xl font-bold mb-8 text-[#6d4b59]">
               Get in Touch
             </h2>
 
-            <div className="space-y-5 text-[#7b5a68]">
-              <a href={`tel:${profile?.phone}`} className="flex gap-2 items-center">
-                <Phone size={18} />
-                {profile?.phone}
-              </a>
+            {/* 🔥 SENDING BANNER */}
+            {isSending && (
+              <div className="mb-4 bg-pink-400 text-white px-4 py-2 rounded-xl text-center animate-pulse">
+                📤 Sending your message...
+              </div>
+            )}
 
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  profile?.location || "",
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex gap-2 items-center"
-              >
-                <MapPin size={18} />
-                {profile?.location}
-              </a>
+            {!isSending && (
+              <div className="space-y-5 text-[#7b5a68]">
+                <a href={`tel:${profile?.phone}`} className="flex gap-2 items-center">
+                  <Phone size={18} />
+                  {profile?.phone}
+                </a>
 
-              <a href={`mailto:${profile?.email}`} className="flex gap-2 items-center">
-                <Mail size={18} />
-                {profile?.email}
-              </a>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    profile?.location || "",
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex gap-2 items-center"
+                >
+                  <MapPin size={18} />
+                  {profile?.location}
+                </a>
 
-              <a href={profile?.linkedin} target="_blank" className="flex gap-2 items-center">
-                <FaLinkedin />
-                LinkedIn
-              </a>
+                <a href={`mailto:${profile?.email}`} className="flex gap-2 items-center">
+                  <Mail size={18} />
+                  {profile?.email}
+                </a>
 
-              <a href={profile?.github} target="_blank" className="flex gap-2 items-center">
-                <FaGithub />
-                GitHub
-              </a>
-            </div>
+                <a href={profile?.linkedin} target="_blank" className="flex gap-2 items-center">
+                  <FaLinkedin />
+                  LinkedIn
+                </a>
 
+                <a href={profile?.github} target="_blank" className="flex gap-2 items-center">
+                  <FaGithub />
+                  GitHub
+                </a>
+              </div>
+            )}
+
+            {/* CV */}
             <div className="mt-10 border-t pt-6 space-y-4 text-[#6d4b59]">
               <h3 className="text-lg font-semibold">CV</h3>
 
@@ -141,7 +155,7 @@ export default function Contact() {
 
               <div className="flex gap-4">
                 <button
-                  disabled={!latestCv?.cv}
+                  disabled={!latestCv?.cv || isSending}
                   onClick={() => handleView(latestCv?.cv)}
                   className="px-5 py-2 bg-pink-400 text-white rounded-xl font-semibold disabled:opacity-50 flex items-center gap-2"
                 >
@@ -150,7 +164,7 @@ export default function Contact() {
                 </button>
 
                 <button
-                  disabled={!latestCv?.cv}
+                  disabled={!latestCv?.cv || isSending}
                   onClick={() => handleDownload(latestCv?.cv)}
                   className="px-5 py-2 border border-pink-400 text-pink-400 rounded-xl font-semibold disabled:opacity-50"
                 >
@@ -160,6 +174,7 @@ export default function Contact() {
             </div>
           </div>
 
+          {/* RIGHT FORM */}
           <div className="bg-white/70 backdrop-blur-md border border-pink-100 p-8 rounded-[32px]">
             <h2 className="text-2xl font-bold mb-8 text-[#6d4b59]">
               Send Message
@@ -170,6 +185,7 @@ export default function Contact() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                disabled={isSending}
                 placeholder="Your Name"
                 className="w-full p-4 rounded-2xl bg-[#fde7ef]"
               />
@@ -178,6 +194,7 @@ export default function Contact() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                disabled={isSending}
                 placeholder="Your Email"
                 className="w-full p-4 rounded-2xl bg-[#fde7ef]"
               />
@@ -186,18 +203,23 @@ export default function Contact() {
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
+                disabled={isSending}
                 placeholder="Your Message"
                 className="w-full p-4 rounded-2xl bg-[#fde7ef]"
               />
 
-              <button className="w-full bg-pink-400 text-white py-4 rounded-2xl font-semibold">
-                Send Message
+              <button
+                disabled={isSending}
+                className="w-full bg-pink-400 text-white py-4 rounded-2xl font-semibold disabled:opacity-50"
+              >
+                {isSending ? "Sending..." : "Send Message"}
               </button>
             </form>
           </div>
         </div>
       </div>
 
+      {/* CV MODAL */}
       {viewUrl && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white w-[85%] h-[90%] rounded-xl relative">

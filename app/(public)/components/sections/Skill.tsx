@@ -1,7 +1,7 @@
 "use client";
 
 import { useSkill } from "@/hooks/useSkill";
-
+import LoadingSpinner from "@/shared/Loading";
 export default function Skill() {
   const { skills } = useSkill();
 
@@ -20,26 +20,32 @@ export default function Skill() {
         </div>
       </div>
 
-      <div className="overflow-hidden">
-        <div className="flex w-max animate-[scrollLeft_12s_linear_infinite] gap-[50px]">
-          {[...safeSkills, ...safeSkills].map((skill, index) => (
-            <div
-              key={`${skill.id ?? skill.name}-${index}`}
-              className="w-[200px] h-[180px] bg-white rounded-[12px] flex flex-col justify-center items-center shrink-0"
-            >
-              <img
-                src={skill.image}
-                alt={skill.name}
-                className="w-[50px] h-[50px] object-contain mb-4"
-              />
+      {safeSkills.length > 0 ? (
+        <div className="overflow-hidden">
+          <div className="flex w-max animate-[scrollLeft_12s_linear_infinite] gap-[50px]">
+            {[...safeSkills, ...safeSkills].map((skill, index) => (
+              <div
+                key={`${skill.id ?? skill.name}-${index}`}
+                className="w-[200px] h-[180px] bg-white rounded-[12px] flex flex-col justify-center items-center shrink-0"
+              >
+                <img
+                  src={skill.image}
+                  alt={skill.name}
+                  className="w-[50px] h-[50px] object-contain mb-4"
+                />
 
-              <h3 className="text-black text-[16px] font-medium">
-                {skill.name}
-              </h3>
-            </div>
-          ))}
+                <h3 className="text-black text-[16px] font-medium">
+                  {skill.name}
+                </h3>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div>
+         <LoadingSpinner/>
+        </div>
+      )}
     </section>
   );
 }

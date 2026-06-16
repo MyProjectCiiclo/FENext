@@ -7,21 +7,27 @@ import toast from "react-hot-toast";
 export function useSkill() {
   const queryClient = useQueryClient();
 
-  const {
-    data,
-    isLoading,
-  } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["skills"],
     queryFn: skillService.getSkills,
   });
 
   const createSkill = useMutation({
     mutationFn: skillService.createSkill,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["skills"] });
-      toast.success("Skill created");
+
+    onMutate: () => {
+      const id = toast.loading("Creating skill...");
+      return { toastId: id };
     },
-    onError: () => {
+
+    onSuccess: (_, __, context) => {
+      toast.dismiss(context?.toastId);
+      toast.success("Skill created");
+      queryClient.invalidateQueries({ queryKey: ["skills"] });
+    },
+
+    onError: (_, __, context) => {
+      toast.dismiss(context?.toastId);
       toast.error("Create skill failed");
     },
   });
@@ -29,22 +35,40 @@ export function useSkill() {
   const updateSkill = useMutation({
     mutationFn: ({ id, data }: { id: number; data: FormData }) =>
       skillService.updateSkill(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["skills"] });
-      toast.success("Skill updated");
+
+    onMutate: () => {
+      const id = toast.loading("Updating skill...");
+      return { toastId: id };
     },
-    onError: () => {
+
+    onSuccess: (_, __, context) => {
+      toast.dismiss(context?.toastId);
+      toast.success("Skill updated");
+      queryClient.invalidateQueries({ queryKey: ["skills"] });
+    },
+
+    onError: (_, __, context) => {
+      toast.dismiss(context?.toastId);
       toast.error("Update failed");
     },
   });
 
   const deleteSkill = useMutation({
     mutationFn: skillService.deleteSkill,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["skills"] });
-      toast.success("Skill deleted");
+
+    onMutate: () => {
+      const id = toast.loading("Deleting skill...");
+      return { toastId: id };
     },
-    onError: () => {
+
+    onSuccess: (_, __, context) => {
+      toast.dismiss(context?.toastId);
+      toast.success("Skill deleted");
+      queryClient.invalidateQueries({ queryKey: ["skills"] });
+    },
+
+    onError: (_, __, context) => {
+      toast.dismiss(context?.toastId);
       toast.error("Delete failed");
     },
   });
@@ -52,6 +76,7 @@ export function useSkill() {
   return {
     skills: data?.data ?? [],
     loading: isLoading,
+
     createSkill: createSkill.mutate,
     updateSkill: updateSkill.mutate,
     deleteSkill: deleteSkill.mutate,
