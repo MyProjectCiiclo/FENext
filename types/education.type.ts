@@ -17,5 +17,5 @@ export type UpdateEducationDTO = {
   major: string;
   start_date: string | null | undefined;
   end_date: string | null | undefined;
-  description: string;
+  description: string | null;
 };
