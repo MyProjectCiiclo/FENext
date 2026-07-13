@@ -7,6 +7,7 @@ import {
   Skill,
   WorkExperience,
   RatingSection,
+  Education,
 } from "./components/sections";
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
     <main>
       <IntroSection />
       <About />
+      <Education />
       <WorkExperience />
       <Skill />
       <GithubActivity />

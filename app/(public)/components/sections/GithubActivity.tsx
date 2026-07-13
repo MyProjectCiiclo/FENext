@@ -36,10 +36,14 @@ export default function GithubActivity() {
       <div className="w-full">
 
         <div className="flex justify-center mb-10">
-          <div className="relative bg-[#f8d9e5] text-pink-500 px-6 py-2 rounded-xl font-semibold">
-            Github Activity
-            <span className="hidden md:block absolute top-1/2 right-full w-28 h-[1px] bg-pink-200 mr-4" />
-            <span className="hidden md:block absolute top-1/2 left-full w-28 h-[1px] bg-pink-200 ml-4" />
+          <div className="flex items-center justify-center gap-5 mb-6">
+            <span className="h-px w-16 bg-pink-300"></span>
+
+            <span className="uppercase tracking-[0.3em] text-[24px] text-base font-semibold text-pink-500">
+              Github Activity
+            </span>
+
+            <span className="h-px w-16 bg-pink-300"></span>
           </div>
         </div>
 
@@ -67,7 +71,7 @@ export default function GithubActivity() {
 
         {loading ? (
           <div >
-            <LoadingSpinner/>
+            <LoadingSpinner />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -97,9 +101,9 @@ export default function GithubActivity() {
                     return (
                       <div
                         key={`${wi}-${di}`}
-                        className="w-4 h-4 rounded-sm"
+                        className="w-4 h-4 rounded-sm cursor-pointer transition-transform hover:scale-125"
                         style={{ backgroundColor: bg }}
-                        title={`${day.date} - ${day.contributionCount}`}
+                        title={`${day.date} - ${day.contributionCount} contributions`}
                       />
                     );
                   })

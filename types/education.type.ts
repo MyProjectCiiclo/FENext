@@ -5,9 +5,9 @@ export interface Education {
   school: string;
   degree: string;
   major: string;
-  start_date: string | null | undefined;
-  end_date: string | null | undefined;
-  description: string;
+  start_date: string;
+  end_date: string;
+  description: string | null;
   courses: Course[];
 }
 
