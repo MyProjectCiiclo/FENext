@@ -6,3 +6,4 @@ export { default as Skill } from "./Skill";
 export { default as WorkExperience } from "./WorkExperience";
 export { default as ProjectList } from "./ProjectList";
 export { default as RatingSection } from "./RatingSection";
+export { default as Education } from "./Education";
