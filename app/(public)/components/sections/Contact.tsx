@@ -79,11 +79,16 @@ export default function Contact() {
     <section id="contact" className="bg-[#FDF0F5] px-6 py-10 lg:px-[180px]">
       <div className="max-w-7xl mx-auto">
 
-        {/* HEADER */}
         <div className="text-center mb-16">
-          <div className="inline-block bg-[#f8d9e5] text-pink-400 px-8 py-3 rounded-xl text-lg font-semibold mb-6">
-            Contact Me
-          </div>
+          <div className="flex items-center justify-center gap-5 mb-6">
+  <span className="h-px w-16 bg-pink-300"></span>
+
+  <span className="uppercase tracking-[0.3em] text-[24px] text-base font-semibold text-pink-500">
+    Contact Me
+  </span>
+
+  <span className="h-px w-16 bg-pink-300"></span>
+</div>
 
           <h2 className="text-2xl lg:text-3xl font-bold text-pink-400 mb-5">
             Let’s Work Together

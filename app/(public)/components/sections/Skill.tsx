@@ -13,16 +13,20 @@ export default function Skill() {
       className="bg-[#FDF0F5] py-10 overflow-hidden px-6 lg:px-[180px]"
     >
       <div className="relative w-fit mx-auto mb-[70px]">
-        <div className="relative inline-block bg-[#f8d9e5] text-pink-400 px-8 py-3 rounded-xl text-lg font-semibold">
-          Skills
-          <span className="hidden md:block absolute top-1/2 right-full w-28 h-[1px] bg-pink-200 mr-4"></span>
-          <span className="hidden md:block absolute top-1/2 left-full w-28 h-[1px] bg-pink-200 ml-4"></span>
+        <div className="flex items-center justify-center gap-5 mb-6">
+          <span className="h-px w-16 bg-pink-300"></span>
+
+          <span className="uppercase tracking-[0.3em] text-[24px] text-base font-semibold text-pink-500">
+            Skills
+          </span>
+
+          <span className="h-px w-16 bg-pink-300"></span>
         </div>
       </div>
 
       {safeSkills.length > 0 ? (
         <div className="overflow-hidden">
-          <div className="flex w-max animate-[scrollLeft_12s_linear_infinite] gap-[50px]">
+          <div className="flex w-max animate-[scrollLeft_30s_linear_infinite] gap-[50px]">
             {[...safeSkills, ...safeSkills].map((skill, index) => (
               <div
                 key={`${skill.id ?? skill.name}-${index}`}
@@ -43,7 +47,7 @@ export default function Skill() {
         </div>
       ) : (
         <div>
-         <LoadingSpinner/>
+          <LoadingSpinner />
         </div>
       )}
     </section>

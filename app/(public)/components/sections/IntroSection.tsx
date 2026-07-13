@@ -17,7 +17,7 @@ export default function IntroSection() {
       <div className="relative grid lg:grid-cols-2 gap-12 items-center">
         <div>
           <div className=" inline-block bg-[#f8d9e5] text-pink-400 px-8 py-3 rounded-xl text-lg font-semibold mb-6">
-            OPEN TO FRONTEND INTERN ROLES
+OPEN TO JUNIOR SOFTWARE ENGINEER OPPORTUNITIES
           </div>
 
           <h1 className="text-[#6d4b59] text-4xl md:text-6xl font-bold leading-tight mb-6">
@@ -34,7 +34,9 @@ export default function IntroSection() {
 
           <div className="flex gap-4">
             <button className="bg-pink-500 hover:bg-pink-600 px-6 py-3 rounded-lg font-medium transition">
-              Get In Touch →
+              <Link href="/#contact" className="text-[#fff] no-underline">
+                Get In Touch →
+              </Link>
             </button>
 
             <button className="border border-[#6d4b59] px-6 py-3 rounded-lg transition">
