@@ -6,7 +6,7 @@ export interface Education {
   degree: string;
   major: string;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   description: string | null;
   courses: Course[];
 }
@@ -15,7 +15,7 @@ export type UpdateEducationDTO = {
   school: string;
   degree: string;
   major: string;
-  start_date: string | null | undefined;
-  end_date: string | null | undefined;
+  start_date: string | null;
+  end_date: string | null;
   description: string | null;
 };
