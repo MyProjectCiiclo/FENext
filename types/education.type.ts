@@ -5,7 +5,7 @@ export interface Education {
   school: string;
   degree: string;
   major: string;
-  start_date: string;
+  start_date: string | null;
   end_date: string | null;
   description: string | null;
   courses: Course[];

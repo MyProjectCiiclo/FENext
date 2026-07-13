@@ -164,16 +164,17 @@ export default function EducationSection() {
 
 
                                     <span>
-                                        {new Date(edu.start_date).getFullYear()}
+                                        {edu.start_date
+                                            ? new Date(edu.start_date).getFullYear()
+                                            : ""}
                                         {" - "}
-                                        {new Date(edu.end_date).getFullYear()}
+                                        {edu.end_date
+                                            ? new Date(edu.end_date).getFullYear()
+                                            : "Present"}
                                     </span>
 
 
                                 </div>
-
-
-
 
 
                                 {edu.description && (
